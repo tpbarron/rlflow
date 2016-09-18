@@ -10,10 +10,6 @@ Tests for `rlcore` module.
 
 import pytest
 
-
-from rlcore import rlcore
-
-
 class TestRlcore(object):
 
     @classmethod
@@ -26,4 +22,3 @@ class TestRlcore(object):
     @classmethod
     def teardown_class(cls):
         pass
-
