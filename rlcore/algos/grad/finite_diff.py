@@ -29,18 +29,9 @@ class FiniteDifference:
                 #print ("rollout_with_policy variation")
                 total_reward = self.env.rollout_with_policy(policy_variation, episode_len)
 
-                deltaJs[p*self.num_weights + i] = total_reward - J_ref
-                deltaTs[p*self.num_weights,:] = deltas.reshape((self.num_weights,))
+                deltaJs[p*self.num_weights+i] = total_reward - J_ref
+                deltaTs[p*self.num_weights+i,:] = deltas.reshape((self.num_weights,))
 
-        # #print ("Has inf: ", np.isinf(np.sum(deltaTs)))
-        # #print (deltaTs)
-        # deltaTs_tmp = np.dot(deltaTs.T, deltaTs)
-        # ## check for nans and infs
-        # #print ("Has nan: ", np.isnan(np.sum(deltaTs_tmp)))
-        # #print ("Has inf: ", np.isinf(np.sum(deltaTs_tmp)))
-        # deltaTs_tmp = np.linalg.pinv(deltaTs_tmp)
-        # deltaTs_tmp = np.dot(deltaTs_tmp, deltaTs.T)
-        # grad = np.dot(deltaTs_tmp, deltaJs)
+        # TODO: may need to check for nans/infs here
         grad = np.dot(np.dot(np.linalg.pinv(np.dot(deltaTs.T, deltaTs)), deltaTs.T), deltaJs)
-        #self.policy.update(grad)
         return grad

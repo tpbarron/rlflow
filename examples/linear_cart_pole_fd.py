@@ -6,7 +6,6 @@ import numpy as np
 from rlcore.envs.normalized_env import normalize
 from rlcore.envs.box2d.cartpole_env import CartpoleEnv
 from rlcore.policies.f_approx.linear import LinearApproximator
-from rlcore.policies.f_approx.linear_gaussian import LinearGaussianApproximator
 from rlcore.algos.grad.finite_diff import FiniteDifference
 
 
@@ -28,17 +27,12 @@ def run_test_episode(env, lin_approx, episode_len=np.inf):
 
 if __name__ == "__main__":
     env = normalize(CartpoleEnv())
+    lin_approx = LinearApproximator(env.observation_space.flat_dim,  lr=0.0001)
+    fd = FiniteDifference(env, num_passes=2)
 
-    lin_approx = LinearGaussianApproximator(env.observation_space.flat_dim,
-                                            num_gaussians=20,
-                                            discretization=100)
-    lin_approx = LinearApproximator(env.observation_space.flat_dim)
-    fd = FiniteDifference(env, num_passes=10)
-
-    # TODO: something goes wrong when I set the episode_len
-    # rewards are no longer correct
-    max_itr = 1000
+    max_itr = 2500
+    max_episode_len = 1000
     for i in range(max_itr):
-        grad = fd.optimize(lin_approx, episode_len=100) #lin_approx.discretization)
+        grad = fd.optimize(lin_approx, episode_len=max_episode_len)
         lin_approx.update(grad)
-        run_test_episode(env, lin_approx, episode_len=100)# lin_approx.discretization)
+        run_test_episode(env, lin_approx, episode_len=max_episode_len)

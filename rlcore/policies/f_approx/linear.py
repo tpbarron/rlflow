@@ -16,7 +16,7 @@ class LinearApproximator(FunctionApproximator):
 
     def get_weight_variation(self, dist='gaussian'):
         # define distribution based on given weights
-        mu, sigma = 0.0, 2*np.std(self.w)
+        mu, sigma = 0.0, np.std(self.w)
         deltas = np.random.normal(mu, sigma, self.w.shape)
         varied_weights = np.add(np.copy(self.w), deltas)
         policy_variation = LinearApproximator(self.n, lr=self.lr)
@@ -28,5 +28,5 @@ class LinearApproximator(FunctionApproximator):
         self.w += self.lr * gradient
 
 
-    def predict(self, input, **kwargs):
+    def predict(self, input):
         return np.dot(self.w, input)
