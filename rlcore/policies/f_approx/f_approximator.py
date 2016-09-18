@@ -6,6 +6,14 @@ class FunctionApproximator(object):
         pass
 
 
+    def get_num_weights(self):
+        raise NotImplementedError
+        
+
+    def get_weight_variation(self):
+        raise NotImplementedError
+
+
     def update(self, gradient):
         raise NotImplementedError
 
