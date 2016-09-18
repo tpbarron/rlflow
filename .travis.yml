@@ -2,7 +2,7 @@
 # This file will be regenerated if you run travis_pypi_setup.py
 
 language: python
-python: 3.5
+python: 2.7
 
 env:
   - TOXENV=py35
@@ -11,6 +11,11 @@ env:
   - TOXENV=py27
   - TOXENV=py26
   - TOXENV=pypy
+
+
+before_install:
+  - sudo apt-get install swig
+  - sudo apt-get install python-pygame
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox
