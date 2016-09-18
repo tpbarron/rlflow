@@ -1,7 +1,7 @@
 from .base import Space
 import numpy as np
-from rllab.misc import special
-from rllab.misc import ext
+from rlcore.misc import special
+from rlcore.misc import ext
 
 
 class Discrete(Space):

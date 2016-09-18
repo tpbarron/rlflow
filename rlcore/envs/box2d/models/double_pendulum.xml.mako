@@ -1,5 +1,5 @@
 <%
-    from rllab.misc.mako_utils import compute_rect_vertices
+    from rlcore.misc.mako_utils import compute_rect_vertices
     link_len = opts['link_len']
     link_width = 0.1
 %>
@@ -37,4 +37,3 @@
     <state type="avel" body="link2"/>
   </world>
 </box2d>
-

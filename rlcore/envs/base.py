@@ -1,6 +1,6 @@
 from .env_spec import EnvSpec
 import collections
-
+import numpy as np
 
 class Env(object):
     def step(self, action):
@@ -47,6 +47,24 @@ class Env(object):
     @property
     def action_dim(self):
         return self.action_space.flat_dim
+
+    def rollout_with_policy(self, policy, episode_len=np.inf):
+        """
+        Runs environment to completion and returns reward under given policy
+        """
+        reward = 0.0
+        done = False
+        obs = self.reset()
+        episode_itr = 0
+        while not done and episode_itr < episode_len:
+            self.render()
+            action = policy.predict(obs, t=episode_itr)
+            step = self.step(action)
+            done = step.done
+            obs = step.observation
+            reward += step.reward
+            episode_itr += 1
+        return reward
 
     def render(self):
         pass

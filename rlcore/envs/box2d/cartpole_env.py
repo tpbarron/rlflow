@@ -1,10 +1,10 @@
 import numpy as np
-from rllab.envs.box2d.parser import find_body
+from rlcore.envs.box2d.parser import find_body
 
-from rllab.core.serializable import Serializable
-from rllab.envs.box2d.box2d_env import Box2DEnv
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
+from rlcore.core.serializable import Serializable
+from rlcore.envs.box2d.box2d_env import Box2DEnv
+from rlcore.misc import autoargs
+from rlcore.misc.overrides import overrides
 
 
 class CartpoleEnv(Box2DEnv, Serializable):
@@ -53,4 +53,3 @@ class CartpoleEnv(Box2DEnv, Serializable):
     def is_current_done(self):
         return abs(self.cart.position[0]) > self.max_cart_pos or \
             abs(self.pole.angle) > self.max_pole_angle
-

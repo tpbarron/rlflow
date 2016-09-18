@@ -1,6 +1,6 @@
-from rllab.spaces.base import Space
+from rlcore.spaces.base import Space
 import numpy as np
-from rllab.misc import ext
+from rlcore.misc import ext
 
 
 class Product(Space):

@@ -4,10 +4,10 @@ import xml.etree.ElementTree as ET
 
 import Box2D
 import numpy as np
-from rllab.envs.box2d.parser.xml_types import XmlElem, XmlChild, XmlAttr, \
+from rlcore.envs.box2d.parser.xml_types import XmlElem, XmlChild, XmlAttr, \
     XmlChildren
 
-from rllab.envs.box2d.parser.xml_attr_types import Tuple, Float, Choice, \
+from rlcore.envs.box2d.parser.xml_attr_types import Tuple, Float, Choice, \
     String, List, Point2D, Hex, Int, Angle, Bool, Either
 
 

@@ -1,7 +1,7 @@
-from rllab.core.serializable import Serializable
+from rlcore.core.serializable import Serializable
 from .base import Space
 import numpy as np
-from rllab.misc import ext
+from rlcore.misc import ext
 import theano
 
 
@@ -74,4 +74,3 @@ class Box(Space):
             ndim=extra_dims+1,
             dtype=theano.config.floatX
         )
-

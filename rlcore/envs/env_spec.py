@@ -1,4 +1,4 @@
-from rllab.core.serializable import Serializable
+from rlcore.core.serializable import Serializable
 
 
 class EnvSpec(Serializable):

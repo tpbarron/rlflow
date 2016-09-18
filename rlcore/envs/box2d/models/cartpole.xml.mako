@@ -1,5 +1,5 @@
 <%
-    from rllab.misc.mako_utils import compute_rect_vertices
+    from rlcore.misc.mako_utils import compute_rect_vertices
     cart_width = 4.0 / (12 ** 0.5)
     cart_height = 3.0 / (12 ** 0.5)
 
@@ -45,4 +45,3 @@
     <control type="force" body="cart" anchor="0,0" direction="1,0" ctrllimit="-10,10"/>
   </world>
 </box2d>
-
