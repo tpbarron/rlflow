@@ -15,7 +15,8 @@ env:
 before_install:
   - sudo apt-get install swig
   - sudo apt-get install python-pygame
-  - sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+  - sudo apt-get install libblas-dev liblapack-dev
+  - sudo apt-get install gfortran
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox
