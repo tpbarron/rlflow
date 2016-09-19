@@ -9,25 +9,36 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
     An environment to test training the Baxter to reach a given location
     """
 
-    def __init__(self, **kwargs):
-        super(BaxterReacherEnv, self).__init__(**kwargs)
+    def __init__(self, control=BaxterEnv.VELOCITY):
+        super(BaxterReacherEnv, self).__init__(control=control)
 
 
-    def reset(self):
-        raise NotImplementedError
+    #def reset(self):
+    #   in parent class
 
 
     def step(self, action):
-        raise NotImplementedError
+        if (self.control == VELOCITY):
+            self.llimb.set_joint_velocities(action)
+            self.rlimb.set_joint_velocities(action)
+        elif (self.control == TORQUE):
+            self.llimb.set_joint_torques(action)
+            self.rlimb.set_joint_torques(action)
+
+        self.state = self.get_joint_angles()
+
+        # reward = -(distance from goal)
+        # done = within threshold of goal
+        return Step(observation=self.state, reward=reward, done=done)
 
 
     @property
     def action_space(self):
         # this will be the joint space
-        raise NotImplementedError
+        return Box((-np.inf, np.inf), (self.joint_space))
 
 
     @property
     def observation_space(self):
-        # 
-        raise NotImplementedError
+        # [baxter joint angles; goal pos]
+        return Box((-np.inf, np.inf), (self.joint_space))
