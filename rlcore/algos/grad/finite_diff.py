@@ -21,6 +21,7 @@ class FiniteDifference:
 
         for p in range(self.num_passes):
             for i in range(self.num_weights):
+                print ("FD itr = ", p*self.num_passes + i)
                 # adjust policy
                 #print ("Getting policy variation")
                 policy_variation, deltas = policy.get_weight_variation()

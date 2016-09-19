@@ -2,7 +2,9 @@ from __future__ import print_function
 
 from rlcore.envs.base import Env
 from rlcore.core.serializable import Serializable
+from rlcore.misc.overrides import overrides
 
+import numpy as np
 import rospy
 from dynamic_reconfigure.server import Server
 from std_msgs.msg import Empty
@@ -34,8 +36,8 @@ class BaxterEnv(Env, Serializable):
         self.control = control
 
         # create our limb instance
-        self.llimb = baxter_interface.Limb(LEFT_LIMB)
-        self.rlimb = baxter_interface.Limb(RIGHT_LIMB)
+        self.llimb = baxter_interface.Limb(BaxterEnv.LEFT_LIMB)
+        self.rlimb = baxter_interface.Limb(BaxterEnv.RIGHT_LIMB)
 
         # robot state
         self.joint_space = 2*len(self.llimb.joint_angles())
@@ -64,25 +66,47 @@ class BaxterEnv(Env, Serializable):
 
 
     def get_joint_angles(self):
-        return np.array(self.llimb.joint_angles() + self.rlimb.joint_angles())
+        ljointdict = self.llimb.joint_angles()
+        rjointdict = self.rlimb.joint_angles()
+        ljointangles = [ljointdict[x] for x in self.llimb._joint_names[BaxterEnv.LEFT_LIMB]]
+        rjointangles = [rjointdict[x] for x in self.rlimb._joint_names[BaxterEnv.RIGHT_LIMB]]
+        return np.array(ljointangles + rjointangles)
 
 
+    def get_endeff_position(self):
+        return np.array(list(self.llimb.endpoint_pose()['position']) + list(self.rlimb.endpoint_pose()['position']))
+
+
+    def get_joint_action_dict(self, action, arm):
+        if (arm == BaxterEnv.LEFT_LIMB):
+            keys = self.llimb._joint_names[BaxterEnv.LEFT_LIMB]
+            return dict(zip(keys, action.tolist()[:self.joint_space/2]))
+        if (arm == BaxterEnv.RIGHT_LIMB):
+            keys = self.rlimb._joint_names[BaxterEnv.RIGHT_LIMB]
+            return dict(zip(keys, action.tolist()[self.joint_space/2:]))
+        raise ValueError
+
+    @overrides
     def reset(self):
         self.llimb.move_to_neutral()
         self.rlimb.move_to_neutral()
         self.state = self.get_joint_angles()
+        #print ("state = ", self.state)
         return self.state
 
 
+    @overrides
     def step(self, action):
         raise NotImplementedError
 
 
     @property
+    @overrides
     def action_space(self):
         raise NotImplementedError
 
 
     @property
+    @overrides
     def observation_space(self):
         raise NotImplementedError
