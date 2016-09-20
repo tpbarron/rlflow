@@ -58,18 +58,7 @@ class Env(object):
         episode_itr = 0
         while not done and episode_itr < episode_len:
             self.render()
-            # print ("obs = ", obs)
-            # if (np.isnan(np.sum(obs))):
-            #     print ("obs has nan")
-            #     import sys
-            #     sys.exit(1)
             action = policy.predict(obs)
-            # print ("action = ", action)
-            # if (np.isnan(np.sum(action))):
-            #     print ("action has nan")
-            #     import sys
-            #     sys.exit(1)
-            # print (type(self))
             step = self.step(action)
             done = step.done
             obs = step.observation

@@ -27,11 +27,7 @@ class LinearApproximator(FunctionApproximator):
 
     def update(self, gradient):
         self.w += self.lr * gradient.reshape(self.m, self.n)
-        
+
 
     def predict(self, input):
-        #print ("input = ", input)
-        #print ("w = ", self.w)
-        #print (np.isnan(np.sum(self.w)))
-        #print (np.isnan(np.sum(np.dot(self.w, input))))
         return np.dot(self.w, input)

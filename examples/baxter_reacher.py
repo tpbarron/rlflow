@@ -26,15 +26,16 @@ def run_test_episode(env, lin_approx, episode_len=np.inf):
 
 
 if __name__ == "__main__":
-    env = BaxterReacherEnv() #normalize(BaxterReacherEnv())
+    env = BaxterReacherEnv(control=BaxterReacherEnv.TORQUE, limbs=BaxterReacherEnv.LEFT_LIMB) #normalize(BaxterReacherEnv())
+    print ("Goal = ", env.goal)
     lin_approx = LinearApproximator(env.observation_space.flat_dim, env.action_dim, lr=0.0001)
     fd = FiniteDifference(env, num_passes=2)
 
     max_itr = 2500
     max_episode_len = 100
     for i in range(max_itr):
-        print ("Opt iter = ", i)
+        print ("Optimization iter = ", i)
         grad = fd.optimize(lin_approx, episode_len=max_episode_len)
-        print ("Grad = ", grad)
+        #print ("Grad = ", grad)
         lin_approx.update(grad)
         run_test_episode(env, lin_approx, episode_len=max_episode_len)
