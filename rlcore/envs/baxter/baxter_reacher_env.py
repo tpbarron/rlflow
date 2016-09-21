@@ -12,8 +12,8 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
     An environment to test training the Baxter to reach a given location
     """
 
-    def __init__(self, control=BaxterEnv.POSITION, limbs=BaxterEnv.BOTH_LIMBS):
-        super(BaxterReacherEnv, self).__init__(control=control, limbs=limbs)
+    def __init__(self, timesteps, control=BaxterEnv.POSITION, limbs=BaxterEnv.BOTH_LIMBS,):
+        super(BaxterReacherEnv, self).__init__(timesteps, control=control, limbs=limbs)
 
         # left(x, y, z), right(x, y, z)
         # x is forward, y is left, z is up
@@ -24,8 +24,6 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
             self.goal = np.array([np.random.random(), -np.random.random(), 1.0])
         elif (self.limbs == BaxterEnv.RIGHT_LIMB):
             self.goal = np.array([np.random.random(), np.random.random(), 1.0])
-
-        self.threshold = .5
 
 
     @overrides
@@ -46,9 +44,11 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
 
 
     @overrides
-    def step(self, action):
+    def step(self, action, **kwargs):
         if (self.limbs == BaxterEnv.BOTH_LIMBS):
             laction, raction = self.get_joint_action_dict(action)
+            assert(len(laction)) == len(self.llimb.joint_angles())
+            assert(len(raction)) == len(self.rlimb.joint_angles())
             if (self.control == BaxterEnv.VELOCITY):
                 self.llimb.set_joint_velocities(laction)
                 self.rlimb.set_joint_velocities(raction)
@@ -60,6 +60,7 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
                 self.rlimb.set_joint_positions(raction)
         elif (self.limbs == BaxterEnv.LEFT_LIMB):
             laction = self.get_joint_action_dict(action)
+            assert(len(laction)) == len(self.llimb.joint_angles())
             if (self.control == BaxterEnv.VELOCITY):
                 self.llimb.set_joint_velocities(laction)
             elif (self.control == BaxterEnv.TORQUE):
@@ -68,6 +69,7 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
                 self.llimb.set_joint_positions(laction)
         elif (self.limbs == BaxterEnv.RIGHT_LIMB):
             raction = self.get_joint_action_dict(action)
+            assert(len(raction)) == len(self.rlimb.joint_angles())
             if (self.control == BaxterEnv.VELOCITY):
                 self.rlimb.set_joint_velocities(raction)
             elif (self.control == BaxterEnv.TORQUE):
@@ -78,13 +80,15 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
         self.control_rate.sleep()
         self.state = np.hstack((self.get_joint_angles(), self.goal))
 
-        # reward = -dist from goal
-        # reward = 1 if dist < threshold, else 0
-        dist = np.linalg.norm(self.goal-self.get_endeff_position())
-        reward = 1 if dist < self.threshold else 0
+        # only consider reward at end of task
+        # if we are finished, the reward is the distance from the goal, else 0
+        done = True if kwargs['t'] == self.timesteps-1 else False
+        if done:
+            dist = np.linalg.norm(self.goal-self.get_endeff_position())
+            reward = -dist # closer go goal, smaller the value
+        else:
+            reward = 0.0
 
-        # done = within threshold of goal
-        done = True if dist < self.threshold else False
         return Step(observation=self.state, reward=reward, done=done)
 
 

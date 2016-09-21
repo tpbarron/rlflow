@@ -59,7 +59,7 @@ class Env(object):
         while not done and episode_itr < episode_len:
             self.render()
             action = policy.predict(obs)
-            step = self.step(action)
+            step = self.step(action, t=episode_itr)
             done = step.done
             obs = step.observation
             reward += step.reward

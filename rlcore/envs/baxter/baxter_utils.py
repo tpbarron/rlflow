@@ -8,10 +8,26 @@ from baxter_interface import CHECK_VERSION
 from baxter_trajectory import Trajectory
 
 class BaxterUtils:
+
     POSITION, VELOCITY = range(2)
-    
+    LEFT_LIMB, RIGHT_LIMB, BOTH_LIMBS = range(3)
+
     def __init__(self):
-        # vars
+        # print ("Initializing node...")
+        # rospy.init_node("baxter_control")
+        # print ("Getting robot state...")
+        # self.rs = baxter_interface.RobotEnable(CHECK_VERSION)
+        # self.init_state = self.rs.state().enabled
+        # rospy.on_shutdown(self.clean_shutdown)
+        # print ("Enabling robot...")
+        # self.rs.enable()
+        #
+        # self.left = baxter_interface.Limb('left')
+        # self.right = baxter_interface.Limb('right')
+        # self.grip_left = baxter_interface.Gripper('left', CHECK_VERSION)
+        # self.grip_right = baxter_interface.Gripper('right', CHECK_VERSION)
+        # self.rate = rospy.Rate(1000)
+        # self.check_init()
         self.trajs = []
         self.keys = None
 
@@ -34,6 +50,16 @@ class BaxterUtils:
             self.rs.disable()
 
 
+    def check_if_limb_in_space(self, limb, space):
+        """
+        space - a box defined by (x1, y1, z1), (x2, y2, z2)
+        limb - a baxter limb object
+        Returns True if any segment of limb is in space
+        """
+
+        pass
+
+
     def load_trajectories(self, dir):
         """
         Load all trajectories from dir into a list of numpy arrays
@@ -44,10 +70,6 @@ class BaxterUtils:
         for f in files:
             self.keys, traj = self.load_trajectory(os.path.join(dir, f))
             self.trajs.append(traj)
-
-        #self.keys.remove('time')
-        #self.keys.remove('left_gripper')
-        #self.keys.remove('right_gripper')
 
 
     def load_trajectory(self, fname):
@@ -69,26 +91,38 @@ class BaxterUtils:
         return self.trajs
 
 
+    def get_trajectories_without_time(self, limb=BOTH_LIMBS):
+        if (limb == BaxterUtils.BOTH_LIMBS):
+            trajs = [t[:,1:] for t in self.trajs]
+            return trajs
+        elif (limb == BaxterUtils.LEFT_LIMB):
+            # remove time
+            trajs = [t[:,1:] for t in self.trajs]
+            trajs = [t[:,:8] for t in trajs]
+            return trajs
+        elif (limb == BaxterUtils.RIGHT_LIMB):
+            # remove time
+            trajs = [t[:,1:] for t in self.trajs]
+            trajs = [t[:,8:] for t in trajs]
+            return trajs
+
+
     def interpolate_time(self, secs, timesteps):
         time = np.linspace(0, secs, timesteps)
         return time
 
 
-    def dummy_dof(self, timesteps):
-        return np.zeros((timesteps,))
-
-
     def run_loaded_trajectory(self, t=0, mode=POSITION):
-        if mode == BaxterControl.POSITION:
+        if mode == BaxterUtils.POSITION:
             self.run_position_trajectory(self.trajs[t])
-        elif mode == BaxterControl.VELOCITY:
+        elif mode == BaxterUtils.VELOCITY:
             self.run_velocity_trajectory(self.trajs[t])
 
 
     def run_trajectory(self, traj, mode=POSITION):
-        if (mode == BaxterControl.POSITION):
+        if (mode == BaxterUtils.POSITION):
             self.run_position_trajectory(traj)
-        elif (mode == BaxterControl.VELOCITY):
+        elif (mode == BaxterUtils.VELOCITY):
             self.run_velocity_trajectory(traj)
 
 
@@ -144,11 +178,12 @@ class BaxterUtils:
 
 
     def get_num_dof(self):
-        return self.trajs[0].shape[1]#-3 # minus 3 for time,l gripper, r gripper
+        return self.trajs[0].shape[1]
 
 
     def get_limb_coordinate(self):
-        return self.left.endpoint_pose()
+        return self.left.endpoint_pose(), self.right.endpoint_pose()
+
 
     def plot_trajectory(self, t=0):
         """
@@ -171,7 +206,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--dir', dest='dir', required=True)
     args = parser.parse_args()
 
-    bc = BaxterControl()
+    bc = BaxterUtils()
     bc.load_trajectories(args.dir)
     bc.run_trajectory()
     #bc.plot_trajectory()

@@ -48,5 +48,5 @@ class FiniteDifference:
         #         deltaTs[p*self.num_weights+i,:] = deltas.reshape((self.num_weights,))
 
         # TODO: may need to check for nans/infs here
-        grad = np.dot(np.dot(np.linalg.pinv(np.dot(deltaTs.T, deltaTs)), deltaTs.T), deltaJs)
+        grad = np.dot(np.dot(np.linalg.pinv(np.nan_to_num(np.dot(deltaTs.T, deltaTs))), deltaTs.T), deltaJs)
         return grad

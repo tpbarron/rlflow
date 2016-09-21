@@ -27,11 +27,13 @@ class BaxterEnv(Env, Serializable):
     VELOCITY = "velocity"
     POSITION = "position"
 
-    def __init__(self, control=None, limbs=None):
+    def __init__(self, timesteps, control=None, limbs=None):
         Serializable.quick_init(self, locals())
 
         print("Initializing node... ")
         rospy.init_node("rlcore_baxter_env")
+
+        self.timesteps = timesteps
 
         if control == None:
             control = BaxterEnv.POSITION
@@ -164,11 +166,11 @@ class BaxterEnv(Env, Serializable):
             return ldict, rdict
         elif (self.limbs == BaxterEnv.LEFT_LIMB):
             lkeys = self.llimb._joint_names[BaxterEnv.LEFT_LIMB]
-            ldict = dict(zip(lkeys, action.tolist()[:self.joint_space/2]))
+            ldict = dict(zip(lkeys, action.tolist()[:self.joint_space]))
             return ldict
         elif (self.limbs == BaxterEnv.RIGHT_LIMB):
             rkeys = self.rlimb._joint_names[BaxterEnv.RIGHT_LIMB]
-            rdict = dict(zip(rkeys, action.tolist()[:self.joint_space/2]))
+            rdict = dict(zip(rkeys, action.tolist()[:self.joint_space]))
             return rdict
 
 

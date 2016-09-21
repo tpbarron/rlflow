@@ -16,9 +16,9 @@ class MovementPrimitivesApproximator(FunctionApproximator):
         return self.w.size
 
 
-    def get_weight_variation(self, dist='gaussian'):
+    def get_weight_variation(self, stdev_coef=0.01):
         # define distribution based on given weights
-        mu, sigma = 0.0, 0.01*np.std(self.w)
+        mu, sigma = 0.0, stdev_coef*np.std(self.w)
         deltas = np.random.normal(mu, sigma, self.w.shape)
         varied_weights = np.add(np.copy(self.w), deltas)
         policy_variation = MovementPrimitivesApproximator(self.promp, lr=self.lr)
@@ -31,9 +31,9 @@ class MovementPrimitivesApproximator(FunctionApproximator):
 
 
     def predict(self, input):
-        # get the t-th position and cut out time
-        prediction = self.promp.get_trajectory_from_weights(self.w, secs=10)[self.t][1:]
-        self.t += 1
-        if (self.t == self.promp.timesteps):
-            self.t = 0
+        # get the t-th timestep
+        prediction = self.promp.get_trajectory_from_weights(self.w)[self.t]
+        self.t = self.t+1 if self.t < self.promp.timesteps else 0
+        #if (self.t == self.promp.timesteps):
+        #    self.t = 0
         return prediction

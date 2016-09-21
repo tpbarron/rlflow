@@ -14,7 +14,7 @@ class Snapshotter:
         f.close()
 
     @classmethod
-    def open(self, fname):
+    def load(self, fname):
         #restore the object
         f = gzip.open(fname, 'rb')
         obj = pickle.load(f)

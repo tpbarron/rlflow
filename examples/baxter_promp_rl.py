@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import sys
+import sys, os, datetime
 import numpy as np
 import argparse
 
@@ -22,7 +22,7 @@ def run_test_episode(env, approx, episode_len=np.inf):
     while not done and episode_itr < episode_len:
         env.render()
         action = approx.predict(obs)
-        step = env.step(action)
+        step = env.step(action, t=episode_itr)
         done = step.done
         obs = step.observation
         total_reward += step.reward
@@ -45,29 +45,34 @@ if __name__ == "__main__":
     bc = BaxterUtils()
     bc.load_trajectories(args.dir)
     bax_promp = ProbabilisticMovementPrimitive(num_bases=20,
-                                  num_dof=bc.get_num_dof(),
-                                  timesteps=1000)
-    bax_promp.set_training_trajectories(bc.get_trajectories())
+                                  num_dof=(bc.get_num_dof()-1)/2,
+                                  timesteps=100)
+    bax_promp.set_training_trajectories(bc.get_trajectories_without_time(limb=BaxterUtils.LEFT_LIMB))
     bax_promp.compute_basis_functions()
     bax_promp.compute_promp_prior()
 
-    prior = bax_promp.get_weights_from_dist(bax_promp.Uw)
-    prior_traj = bax_promp.get_trajectory_from_weights(prior)
+    env = BaxterReacherEnv(bax_promp.timesteps, control=BaxterReacherEnv.POSITION, limbs=BaxterReacherEnv.LEFT_LIMB)
+    #goal_both = np.array([1.1753262657425387, 0.11223764298019563-.5, 0.026154249917259995, 0.8521478534645788, -0.29585696905772585, 0.08423954120828164])
+    goal_left = np.array([1.1753262657425387, 0.11223764298019563-.5, 0.026154249917259995])
+    env.goal = goal_left
 
-    env = BaxterReacherEnv(control=BaxterReacherEnv.POSITION, limbs=BaxterReacherEnv.BOTH_LIMBS) #normalize(BaxterReacherEnv())
-    env.goal = np.array([1.227658244962476, 0.4768209163944621, 0.23905696693000875, 0.8169629678058284, -0.6792894187957359, 0.08773132644854637])
-    #env.goal = np.array([1.0915797781830172, 0.4509717292472076, -0.14485613121910212])
+    logdir = os.path.join("../logs/", datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    os.makedirs(logdir)
 
-    promp_approx = MovementPrimitivesApproximator(bax_promp, lr=0.0001)
+    # load = False
+    # if (load):
+    #     promp_approx = Snapshotter.load("../logs/promp_approx_0_1.0.pklz")
+    # else:
+    promp_approx = MovementPrimitivesApproximator(bax_promp, lr=0.001)
     fd = FiniteDifference(env)
 
     max_itr = 2500
     max_episode_len = bax_promp.timesteps
     for i in range(max_itr):
         print ("Optimization iter = ", i)
-        grad = fd.optimize(promp_approx, num_variations=100, episode_len=max_episode_len)
+        grad = fd.optimize(promp_approx, num_variations=50, episode_len=max_episode_len)
         promp_approx.update(grad)
         reward = run_test_episode(env, promp_approx, episode_len=max_episode_len)
 
-        Snapshotter.snapshot("../logs/promp_approx_"+str(i)+"_"+str(reward)+".pklz", promp_approx)
+        Snapshotter.snapshot(os.path.join(logdir, "promp_approx_"+str(i)+"_"+str(reward)+".pklz"), promp_approx)
         print ("Reward: " + str(reward) + ", on iteration " + str(i))
