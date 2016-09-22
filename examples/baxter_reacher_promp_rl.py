@@ -11,7 +11,7 @@ from rlcore.envs.normalized_env import normalize
 from rlcore.envs.baxter.baxter_utils import BaxterUtils
 from rlcore.envs.baxter.baxter_reacher_env import BaxterReacherEnv
 from rlcore.policies.f_approx.movement_primitive import MovementPrimitivesApproximator
-from rlcore.algos.grad.finite_diff import FiniteDifference
+from rlcore.algos.prob.promp_itr import ProMPIteration
 
 
 def run_test_episode(env, approx, episode_len=np.inf):
@@ -35,43 +35,48 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--dir', dest='dir', required=True)
     parser.add_argument('-m', '--mode', dest='mode', default='p',
         required=False, help='p for position, v for velocity')
-    parser.add_argument('-t', '--time', dest='time', default=3,
-        required=False, help='the number of seconds to run')
+    parser.add_argument('-p', '--policy', dest='policy', default=None,
+        required=False, help='File to load policy from')
     args = parser.parse_args()
 
-    mode = BaxterUtils.POSITION if args.mode == 'p' else BaxterUtils.VELOCITY
-    secs = int(args.time)
+    mode = BaxterReacherEnv.POSITION if args.mode == 'p' else BaxterReacherEnv.VELOCITY
 
     bc = BaxterUtils()
     bc.load_trajectories(args.dir)
-    bax_promp = ProbabilisticMovementPrimitive(num_bases=20,
-                                  num_dof=(bc.get_num_dof()-1)/2,
-                                  timesteps=100)
-    bax_promp.set_training_trajectories(bc.get_trajectories_without_time(limb=BaxterUtils.LEFT_LIMB))
+    bax_promp = ProbabilisticMovementPrimitive(num_bases=2,
+                                  num_dof=BaxterUtils.DOF_NO_TIME_NO_GRIPPER_LEFT,
+                                  timesteps=250)
+    bax_promp.set_training_trajectories(bc.get_trajectories_without_time_and_gripper(limb=BaxterUtils.LEFT_LIMB))
     bax_promp.compute_basis_functions()
     bax_promp.compute_promp_prior()
 
-    env = BaxterReacherEnv(bax_promp.timesteps, control=BaxterReacherEnv.POSITION, limbs=BaxterReacherEnv.LEFT_LIMB)
+    env = BaxterReacherEnv(bax_promp.timesteps, control=mode, limbs=BaxterReacherEnv.LEFT_LIMB)
     #goal_both = np.array([1.1753262657425387, 0.11223764298019563-.5, 0.026154249917259995, 0.8521478534645788, -0.29585696905772585, 0.08423954120828164])
-    goal_left = np.array([1.1753262657425387, 0.11223764298019563-.5, 0.026154249917259995])
-    env.goal = goal_left
+    goal_left_2b = np.array([1.0827930984783736, 0.04922204914382992+.5, 0.06132891610869118])
+    goal_left_10b = np.array([1.1724322298736176, 0.17367959828418025-.5, 0.00945407307459449])
+    goal_left_20b = np.array([1.1753262657425387, 0.11223764298019563-.5, 0.026154249917259995])
+    env.goal = goal_left_2b
 
     logdir = os.path.join("../logs/", datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     os.makedirs(logdir)
 
-    # load = False
-    # if (load):
-    #     promp_approx = Snapshotter.load("../logs/promp_approx_0_1.0.pklz")
-    # else:
-    promp_approx = MovementPrimitivesApproximator(bax_promp, lr=0.001)
-    fd = FiniteDifference(env)
+    # TODO: check this
+    if (args.policy != None):
+        promp_approx = Snapshotter.load(args.policy)
+    else:
+        promp_approx = MovementPrimitivesApproximator(bax_promp)
+    promp_itr = ProMPIteration(env)
 
-    max_itr = 2500
+    max_itr = 250
     max_episode_len = bax_promp.timesteps
+    reward = run_test_episode(env, promp_approx, episode_len=max_episode_len)
+    Snapshotter.snapshot(os.path.join(logdir, "promp_approx_"+str(reward)+".pklz"), promp_approx)
+    print ("Reward: " + str(reward) + ", at start")
+
     for i in range(max_itr):
         print ("Optimization iter = ", i)
-        grad = fd.optimize(promp_approx, num_variations=50, episode_len=max_episode_len)
-        promp_approx.update(grad)
+        Uw, Ew = promp_itr.optimize(promp_approx, episode_len=max_episode_len)
+        promp_approx.update(Uw, Ew)
         reward = run_test_episode(env, promp_approx, episode_len=max_episode_len)
 
         Snapshotter.snapshot(os.path.join(logdir, "promp_approx_"+str(i)+"_"+str(reward)+".pklz"), promp_approx)

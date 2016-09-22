@@ -27,7 +27,7 @@ class BaxterEnv(Env, Serializable):
     VELOCITY = "velocity"
     POSITION = "position"
 
-    def __init__(self, timesteps, control=None, limbs=None):
+    def __init__(self, timesteps, sphere, control=None, limbs=None):
         Serializable.quick_init(self, locals())
 
         print("Initializing node... ")

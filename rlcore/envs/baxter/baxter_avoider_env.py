@@ -2,18 +2,19 @@ from __future__ import print_function
 import sys, time
 import numpy as np
 from .baxter_env import BaxterEnv
+from .baxter_utils import BaxterUtils
 from rlcore.spaces import Box
 from rlcore.envs.base import Step
 from rlcore.core.serializable import Serializable
 from rlcore.misc.overrides import overrides
 
-class BaxterReacherEnv(BaxterEnv, Serializable):
+class BaxterAvoiderEnv(BaxterEnv, Serializable):
     """
     An environment to test training the Baxter to reach a given location
     """
 
-    def __init__(self, timesteps, control=BaxterEnv.POSITION, limbs=BaxterEnv.BOTH_LIMBS,):
-        super(BaxterReacherEnv, self).__init__(timesteps, control=control, limbs=limbs)
+    def __init__(self, timesteps, sphere, control=BaxterEnv.POSITION, limbs=BaxterEnv.BOTH_LIMBS,):
+        super(BaxterAvoiderEnv, self).__init__(timesteps, sphere, control=control, limbs=limbs)
 
         # left(x, y, z), right(x, y, z)
         # x is forward, y is left, z is up
@@ -24,6 +25,10 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
             self.goal = np.array([np.random.random(), -np.random.random(), 1.0])
         elif (self.limbs == BaxterEnv.RIGHT_LIMB):
             self.goal = np.array([np.random.random(), np.random.random(), 1.0])
+
+        self.sphere = sphere
+        self.step_in_sphere = 0
+        self.bax_utils = BaxterUtils()
 
 
     @overrides
@@ -41,6 +46,8 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
             self.rlimb.move_to_neutral()
             self.state = self.get_joint_angles()
             return np.hstack((self.state, self.goal))
+
+        self.step_in_sphere = 0
 
 
     @overrides
@@ -80,13 +87,31 @@ class BaxterReacherEnv(BaxterEnv, Serializable):
         self.control_rate.sleep()
         self.state = np.hstack((self.get_joint_angles(), self.goal))
 
+        # check if in area
+        if (self.limbs == BaxterEnv.BOTH_LIMBS):
+            if (self.bax_utils.limb_in_sphere(self.llimb, self.sphere) or
+                    self.bax_utils.limb_in_sphere(self.rlimb, self.sphere)):
+                self.step_in_sphere += 1
+        elif (self.limbs == BaxterEnv.LEFT_LIMB):
+            if (self.bax_utils.limb_in_sphere(self.llimb, self.sphere)):
+                self.step_in_sphere += 1
+        elif (self.limbs == BaxterEnv.RIGHT_LIMB):
+            if (self.bax_utils.limb_in_sphere(self.rlimb, self.sphere)):
+                self.step_in_sphere += 1
+
+
         # only consider reward at end of task
-        # if we are finished, the reward is the distance from the goal, else 0
+        # if we are finished, the reward is weighted combination of the distance
+        # from the goal and the number of steps in the space
         done = True if kwargs['t'] == self.timesteps-1 else False
         if done:
             dist = np.linalg.norm(self.goal-self.get_endeff_position())
-            reward = np.exp(-dist) # if at goal reward = 1, else asymptopes to 0
-            #reward = -dist # closer go goal, smaller the value
+            dist_reward = np.exp(-dist)
+            space_reward = np.exp(-float(self.step_in_sphere) / self.timesteps)
+            print ("num steps in sphere: ", self.step_in_sphere, dist_reward, space_reward)
+            reward = .5*dist_reward+.5*space_reward # if at goal reward = 1, else asymptopes to 0
+            # TODO: fix this
+            self.step_in_sphere = 0
         else:
             reward = 0.0
 

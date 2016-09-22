@@ -12,6 +12,14 @@ class BaxterUtils:
     POSITION, VELOCITY = range(2)
     LEFT_LIMB, RIGHT_LIMB, BOTH_LIMBS = range(3)
 
+    DOF = 17
+    DOF_NO_TIME = 16
+    DOF_NO_TIME_NO_GRIPPER = 14
+    DOF_NO_TIME_LEFT = 8
+    DOF_NO_TIME_RIGHT = 8
+    DOF_NO_TIME_NO_GRIPPER_LEFT = 7
+    DOF_NO_TIME_NO_GRIPPER_RIGHT = 7
+
     def __init__(self):
         # print ("Initializing node...")
         # rospy.init_node("baxter_control")
@@ -50,14 +58,60 @@ class BaxterUtils:
             self.rs.disable()
 
 
-    def check_if_limb_in_space(self, limb, space):
+    def limb_in_sphere(self, limb, sphere):
         """
-        space - a box defined by (x1, y1, z1), (x2, y2, z2)
+        sphere - a sphere defined by (x, y, z, r)
         limb - a baxter limb object
         Returns True if any segment of limb is in space
         """
+        states = limb.get_link_states()
+        links = limb._link_names[limb.name]
+        for i in range(len(links)-1):
+            l1 = links[i]
+            l2 = links[i+1]
+            p1 = states[l1].position
+            # print ("p1 = ", p1)
+            p2 = states[l2].position
+            # print ("p2 = ", p2)
+            p1 = (p1.x, p1.y, p1.z)
+            p2 = (p2.x, p2.y, p2.z)
+            if (self.check_segment(sphere, (p1, p2))):
+                return True
+        return False
 
-        pass
+
+    def check_segment(self, sphere, segment):
+        """
+        segment = ((x1,y1,z1), (x2,y2,z2))
+        returns True if intersection
+        """
+        p1, p2 = segment
+        x1, y1, z1 = p1
+        x2, y2, z2 = p2
+        x3, y3, z3, r = sphere
+        a = (x2-x1)**2.0 + (y2-y1)**2.0 + (z2-z1)**2.0
+        b = 2*( (x2-x1)*(x1-x3) + (y2-y1)*(y1-y3) + (z2-z1)*(z1-z3) )
+        c = x3**2.0 + y3**2.0 + z3**2.0 + x1**2.0 + y1**2.0 + z1**2.0 - 2*(x3*x1 + y3*y1 + z3*z1) - r**2.0
+
+        u1 = (-b + np.sqrt(b*b-4*a*c)) / 2*a
+        u2 = (-b - np.sqrt(b*b-4*a*c)) / 2*a
+        if ((u1 < 0 and u2 < 0) or (u1 > 1 and u2 > 1)):
+            # line seg outside sphere
+            return False
+        if ((u1 < 0 and u2 > 1) or (u1 > 1 and u2 < 0)):
+            # line segment inside sphere
+            return True
+        if ((abs(u1) < 1 and (u2 > 1 or u2 < 0)) or (abs(u2) < 1 and (u1 > 1 or u1 < 0))):
+            # line segment intersects at one point
+            return True
+        if (abs(u1) < 1 and abs(u2) < 1):
+            # intersects at two points
+            return True
+        if (abs(u1) < 1 and abs(u2) < 1 and u1 - u2 < .001):
+            # tangential
+            return True
+        return False
+
 
 
     def load_trajectories(self, dir):
@@ -104,6 +158,18 @@ class BaxterUtils:
             # remove time
             trajs = [t[:,1:] for t in self.trajs]
             trajs = [t[:,8:] for t in trajs]
+            return trajs
+
+
+    def get_trajectories_without_time_and_gripper(self, limb=BOTH_LIMBS):
+        if (limb == BaxterUtils.BOTH_LIMBS):
+            trajs = [np.hstack((t[:,1:8],t[:,9:16])) for t in self.trajs]
+            return trajs
+        elif (limb == BaxterUtils.LEFT_LIMB):
+            trajs = [t[:,1:8] for t in self.trajs]
+            return trajs
+        elif (limb == BaxterUtils.RIGHT_LIMB):
+            trajs = [t[:,9:16] for t in self.trajs]
             return trajs
 
 
