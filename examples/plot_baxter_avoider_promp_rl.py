@@ -1,7 +1,8 @@
 from __future__ import print_function
 
 import argparse
-from rlcore.viz.plot_rewards import Plotter
+from rlcore.logger.snapshotter import Snapshotter
+from rlcore.viz.plotter import Plotter
 from os import listdir
 from os.path import isfile, join
 
@@ -23,7 +24,14 @@ def parse_rewards(path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot baxter avoider promp rewards')
     parser.add_argument('-d', '--dir', dest='dir', required=True)
+    parser.add_argument('--traj1', dest='t1', default=None, required=False)
+    parser.add_argument('--traj2', dest='t2', default=None, required=False)
     args = parser.parse_args()
 
     ordered_rewards = parse_rewards(args.dir)
     Plotter.plot_values(ordered_rewards)
+
+    if (args.traj1 != None and args.traj2 != None):
+        traj1 = Snapshotter.load(args.traj1)
+        traj2 = Snapshotter.load(args.traj2)
+        Plotter.plot_trajectories(traj1, traj2)
