@@ -1,0 +1,6 @@
+std coeff in movement prim 0.1
+lr = .0001
+250 timesteps
+2 basis functions
+updating reward to be exp(-dist) so 1 is optimal reward
+  when dist from goal is 0

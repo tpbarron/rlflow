@@ -1,0 +1,8 @@
+std coeff in movement prim 0.1
+lr = .01
+250 timesteps
+2 basis functions
+Reward = .5 * exp(-dist) + .5 * exp(-(steps in space)/timesteps)
+  Optimal reward is 1
+
+See logs in: /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53

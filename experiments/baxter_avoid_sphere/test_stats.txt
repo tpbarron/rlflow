@@ -1,0 +1,166 @@
+* Data for test runs for no training, and then 25, 50, 100, 150, 200, 250, and 500 iterations of finite difference gradient descent. Each gradient estimation used 2*num weights variations which in this case was 2*14 (ie: 2 * num_bases * num_dof, only 2 basis function where used and the dof of the arm is 7). Each weight variation was drawn from a gaussian distribution where the mean was 0 and the stdev was 0.1*(stdev of existing weights). The learning rate was set to a static .01
+* Each run was 250 timesteps, so at the beginning the arm passed through the sphere for about 1/6th of the time
+* The reward function = .5 * exp(-dist) + .5 * exp(-(steps in space)/timesteps); the optimal reward is 1. The numbers after steps in sphere are reward for distance and reward for not being in the sphere
+* The sphere had radius of .05, essentially a 5 cm radius sphere in gazebo. I positioned the sphere at the (x,y,z) coordinate of the baxter::left_upper_forearm when it was half way through the initial trajectory (125 timesteps).
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_-1_0.844780915922.pklz --test
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474555851.112687] [261188.335000] Robot Enabled
+num steps in sphere:  39 0.822220736551 0.855559190371
+Reward: 0.838889963461, on test 0
+num steps in sphere:  39 0.824141392327 0.855559190371
+Reward: 0.839850291349, on test 1
+num steps in sphere:  43 0.841339689653 0.841979173168
+Reward: 0.841659431411, on test 2
+num steps in sphere:  41 0.838745220109 0.84874202188
+Reward: 0.843743620995, on test 3
+num steps in sphere:  42 0.822725092335 0.845353834685
+Reward: 0.83403946351, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474555863.678812] [261224.823000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_25_0.860920579238.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556012.532105] [261746.803000] Robot Enabled
+num steps in sphere:  38 0.867074914109 0.858988280741
+Reward: 0.863031597425, on test 0
+num steps in sphere:  40 0.887840121423 0.852143788966
+Reward: 0.869991955195, on test 1
+num steps in sphere:  36 0.863760813218 0.865887748059
+Reward: 0.864824280639, on test 2
+num steps in sphere:  37 0.862217569765 0.862431114942
+Reward: 0.862324342353, on test 3
+num steps in sphere:  40 0.871113562421 0.852143788966
+Reward: 0.861628675694, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556025.075118] [261782.726000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_50_0.868821360576.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556094.042302] [262022.148000] Robot Enabled
+num steps in sphere:  38 0.886775391448 0.858988280741
+Reward: 0.872881836094, on test 0
+num steps in sphere:  36 0.886198378129 0.865887748059
+Reward: 0.876043063094, on test 1
+num steps in sphere:  35 0.877067762183 0.869358235399
+Reward: 0.873212998791, on test 2
+num steps in sphere:  35 0.889069844779 0.869358235399
+Reward: 0.879214040089, on test 3
+num steps in sphere:  33 0.873027332337 0.876340995079
+Reward: 0.874684163708, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556106.368630] [262057.685000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_100_0.905040231755.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556178.454684] [262310.387000] Robot Enabled
+num steps in sphere:  22 0.910348607833 0.915760876723
+Reward: 0.913054742278, on test 0
+num steps in sphere:  20 0.90250738955 0.923116346387
+Reward: 0.912811867968, on test 1
+num steps in sphere:  21 0.902772760156 0.919431256095
+Reward: 0.911102008125, on test 2
+num steps in sphere:  19 0.913104692815 0.926816206559
+Reward: 0.919960449687, on test 3
+num steps in sphere:  28 0.889877090302 0.8940442575
+Reward: 0.891960673901, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556191.222101] [262346.665000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_150_0.942486823653.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556257.167519] [262576.670000] Robot Enabled
+num steps in sphere:  0 0.89059072575 1.0
+Reward: 0.945295362875, on test 0
+num steps in sphere:  0 0.888378343731 1.0
+Reward: 0.944189171865, on test 1
+num steps in sphere:  0 0.89649802584 1.0
+Reward: 0.94824901292, on test 2
+num steps in sphere:  0 0.887284090853 1.0
+Reward: 0.943642045427, on test 3
+num steps in sphere:  0 0.885475902387 1.0
+Reward: 0.942737951194, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556269.899202] [262613.059000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_200_0.945055921986.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556404.746275] [263085.833000] Robot Enabled
+num steps in sphere:  0 0.886245295662 1.0
+Reward: 0.943122647831, on test 0
+num steps in sphere:  0 0.878476528004 1.0
+Reward: 0.939238264002, on test 1
+num steps in sphere:  0 0.880381131833 1.0
+Reward: 0.940190565917, on test 2
+num steps in sphere:  0 0.88858728201 1.0
+Reward: 0.944293641005, on test 3
+num steps in sphere:  0 0.870770487198 1.0
+Reward: 0.935385243599, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556417.349888] [263122.163000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_250_0.951361934167.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556504.861822] [263428.319000] Robot Enabled
+num steps in sphere:  0 0.914516529647 1.0
+Reward: 0.957258264823, on test 0
+num steps in sphere:  0 0.889871674007 1.0
+Reward: 0.944935837004, on test 1
+num steps in sphere:  0 0.908599972301 1.0
+Reward: 0.95429998615, on test 2
+num steps in sphere:  0 0.891787410467 1.0
+Reward: 0.945893705233, on test 3
+num steps in sphere:  0 0.898611998377 1.0
+Reward: 0.949305999189, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556517.305014] [263464.263000] Robot Disabled
+
+
+[baxter - http://localhost:11311] tpbarron@en4113949l:~/Documents/dev/ml/rl/rlcore/examples$ python baxter_avoider_promp_rl.py --test -d ../../../../robotics/baxter/recorded_trajectories/samples_from_neutral/ -p /home/tpbarron/Documents/dev/ml/rl/rlcore/logs/2016-09-21_21-14-53/promp_approx_500_0.961716990441.pklz
+Initializing node... 
+Getting Baxter state... 
+Enabling Baxter... 
+[INFO] [WallTime: 1474556596.387345] [263739.977000] Robot Enabled
+num steps in sphere:  0 0.932333463175 1.0
+Reward: 0.966166731588, on test 0
+num steps in sphere:  0 0.927032548077 1.0
+Reward: 0.963516274038, on test 1
+num steps in sphere:  0 0.925381918615 1.0
+Reward: 0.962690959308, on test 2
+num steps in sphere:  0 0.918871999394 1.0
+Reward: 0.959435999697, on test 3
+num steps in sphere:  0 0.928653002963 1.0
+Reward: 0.964326501481, on test 4
+Exiting Baxter env...
+Disabling robot...
+[INFO] [WallTime: 1474556608.678663] [263775.412000] Robot Disabled
+
+
