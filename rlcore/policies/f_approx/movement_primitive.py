@@ -1,5 +1,5 @@
 import numpy as np
-from iprims.iprims import InteractionPrimitive
+from iprims.ipromp import InteractionPrimitive
 from .f_approximator import FunctionApproximator
 
 class MovementPrimitivesApproximator(FunctionApproximator):
