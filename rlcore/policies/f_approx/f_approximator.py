@@ -1,6 +1,8 @@
 from __future__ import print_function
 
-class FunctionApproximator(object):
+from rlcore.policies.policy import Policy
+
+class FunctionApproximator(Policy):
 
     def __init__(self):
         pass
@@ -8,7 +10,7 @@ class FunctionApproximator(object):
 
     def get_num_weights(self):
         raise NotImplementedError
-        
+
 
     def get_weight_variation(self):
         raise NotImplementedError

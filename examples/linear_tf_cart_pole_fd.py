@@ -1,12 +1,13 @@
 from __future__ import print_function
 
-import sys
+import sys, time
 import numpy as np
+import tensorflow as tf
 
 from rlcore.envs.normalized_env import normalize
 from rlcore.envs.box2d.cartpole_env import CartpoleEnv
-from rlcore.policies.f_approx.linear import LinearApproximator
-from rlcore.algos.grad.finite_diff import FiniteDifference
+from rlcore.policies.f_approx.linear_tf import LinearApproximator
+from rlcore.algos.grad.finite_diff_tf import FiniteDifference
 
 
 def run_test_episode(env, lin_approx, episode_len=np.inf):
@@ -27,12 +28,14 @@ def run_test_episode(env, lin_approx, episode_len=np.inf):
 
 if __name__ == "__main__":
     env = normalize(CartpoleEnv())
-    lin_approx = LinearApproximator(env.observation_space.flat_dim, env.action_dim, lr=0.0001)
-    fd = FiniteDifference(env, num_passes=2)
 
     max_itr = 2500
-    max_episode_len = 1000
-    for i in range(max_itr):
-        grad = fd.optimize(lin_approx, episode_len=max_episode_len)
-        lin_approx.update(grad)
-        run_test_episode(env, lin_approx, episode_len=max_episode_len)
+    max_episode_len = 100
+
+    with tf.Session() as sess:
+        lin_approx = LinearApproximator(env.observation_space.flat_dim, env.action_dim, lr=0.0001)
+        fd = FiniteDifference(env, lin_approx, num_passes=2)
+        for i in range(max_itr):
+            grad = fd.optimize(episode_len=max_episode_len)
+            lin_approx.update(grad)
+            run_test_episode(env, lin_approx, episode_len=max_episode_len)

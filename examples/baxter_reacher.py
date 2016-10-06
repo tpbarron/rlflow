@@ -3,7 +3,6 @@ from __future__ import print_function
 import sys
 import numpy as np
 
-from rlcore.envs.normalized_env import normalize
 from rlcore.envs.baxter.baxter_reacher_env import BaxterReacherEnv
 from rlcore.policies.f_approx.linear import LinearApproximator
 from rlcore.algos.grad.finite_diff import FiniteDifference

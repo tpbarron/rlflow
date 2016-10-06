@@ -4,7 +4,8 @@ import sys
 import numpy as np
 
 from rlcore.envs.normalized_env import normalize
-from rlcore.envs.box2d.cartpole_env import CartpoleEnv
+from rlcore.envs.box2d.mountain_car_env import MountainCarEnv
+from rlcore.envs.proxy_env import ProxyEnv
 from rlcore.policies.f_approx.linear import LinearApproximator
 from rlcore.algos.grad.finite_diff import FiniteDifference
 
@@ -26,11 +27,11 @@ def run_test_episode(env, lin_approx, episode_len=np.inf):
 
 
 if __name__ == "__main__":
-    env = normalize(CartpoleEnv())
-    lin_approx = LinearApproximator(env.observation_space.flat_dim, env.action_dim, lr=0.0001)
+    env = ProxyEnv(MountainCarEnv())
+    lin_approx = LinearApproximator(env.observation_space.flat_dim, env.action_dim, lr=0.0001, weight_variance=1.0)
     fd = FiniteDifference(env, num_passes=2)
 
-    max_itr = 2500
+    max_itr = 250
     max_episode_len = 1000
     for i in range(max_itr):
         grad = fd.optimize(lin_approx, episode_len=max_episode_len)

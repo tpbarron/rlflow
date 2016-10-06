@@ -11,5 +11,4 @@ PyYAML==3.11
 pytest==2.9.2
 path.py==8.2.1
 numpy==1.11.1
-theano==0.8.2
 box2d==2.3.2
