@@ -3,12 +3,12 @@ from .f_approximator import FunctionApproximator
 
 class LinearApproximator(FunctionApproximator):
 
-    def __init__(self, n, m, lr=0.1):
+    def __init__(self, n, m, lr=0.1, weight_variance=1.0):
         super(LinearApproximator, self).__init__()
         self.n = n # input dim
         self.m = m # output dim
         self.lr = lr
-        self.w = np.random.normal(0, 0.01, (m, n))
+        self.w = np.random.normal(0, weight_variance, (m, n))
 
 
     def get_num_weights(self):

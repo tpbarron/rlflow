@@ -1,6 +1,7 @@
 from __future__ import print_function
 import numpy as np
 
+from rlcore.core import rl_utils
 
 class FiniteDifference:
 
@@ -17,7 +18,7 @@ class FiniteDifference:
             num_variations = self.num_passes * self.num_weights
 
         # run episode with initial weights to get J_ref
-        J_ref = self.env.rollout_with_policy(policy, episode_len)
+        J_ref = rl_utils.rollout_env_with_policy(self.env, policy, episode_len=episode_len)
 
         deltaJs = np.empty((self.num_passes*self.num_weights,))
         deltaTs = np.empty((self.num_passes*self.num_weights, self.num_weights))
@@ -27,7 +28,7 @@ class FiniteDifference:
             policy_variation, deltas = policy.get_weight_variation()
 
             # run one episode with new policy
-            total_reward = self.env.rollout_with_policy(policy_variation, episode_len)
+            total_reward = rl_utils.rollout_env_with_policy(self.env, policy_variation, episode_len=episode_len)
             print ("FD variation", i, "of", (num_variations), ", reward =", total_reward)
             deltaJs[i] = total_reward - J_ref
             deltaTs[i,:] = deltas.reshape((self.num_weights,))
