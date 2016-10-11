@@ -3,8 +3,7 @@ from __future__ import print_function
 import sys
 import numpy as np
 
-from rlcore.envs.normalized_env import normalize
-from rlcore.envs.box2d.cartpole_env import CartpoleEnv
+import gym
 from rlcore.policies.f_approx.linear import LinearApproximator
 from rlcore.algos.grad.finite_diff import FiniteDifference
 
@@ -17,17 +16,15 @@ def run_test_episode(env, lin_approx, episode_len=np.inf):
     while not done and episode_itr < episode_len:
         env.render()
         action = lin_approx.predict(obs)
-        step = env.step(action)
-        done = step.done
-        obs = step.observation
-        total_reward += step.reward
+        state, reward, done, info = env.step(action)
+        total_reward += reward
         episode_itr += 1
     print ("Reward: " + str(total_reward) + ", on iteration " + str(i))
 
 
 if __name__ == "__main__":
-    env = normalize(CartpoleEnv())
-    lin_approx = LinearApproximator(env.observation_space.flat_dim, env.action_dim, lr=0.0001)
+    env = gym.make("CartPole-v0")
+    lin_approx = LinearApproximator(env.observation_space.shape[0], 1, lr=0.0001)
     fd = FiniteDifference(env, num_passes=2)
 
     max_itr = 2500

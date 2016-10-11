@@ -30,4 +30,4 @@ class LinearApproximator(FunctionApproximator):
 
 
     def predict(self, input):
-        return np.dot(self.w, input)
+        return int(round(np.dot(self.w, input)))

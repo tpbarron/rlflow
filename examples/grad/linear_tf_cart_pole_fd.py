@@ -3,9 +3,7 @@ from __future__ import print_function
 import sys, time
 import numpy as np
 import tensorflow as tf
-
-from rlcore.envs.normalized_env import normalize
-from rlcore.envs.box2d.cartpole_env import CartpoleEnv
+import gym
 from rlcore.policies.f_approx.linear_tf import LinearApproximator
 from rlcore.algos.grad.finite_diff_tf import FiniteDifference
 
@@ -27,7 +25,7 @@ def run_test_episode(env, lin_approx, episode_len=np.inf):
 
 
 if __name__ == "__main__":
-    env = normalize(CartpoleEnv())
+    env = gym.make("CartPole-v0") #normalize(CartpoleEnv())
 
     max_itr = 2500
     max_episode_len = 100
