@@ -7,8 +7,6 @@ class FiniteDifference:
 
     def __init__(self, env, num_passes=2):
         self.env = env
-        #self.policy = policy
-        #self.num_weights = self.policy.get_num_weights()
         self.num_passes = num_passes
 
 
