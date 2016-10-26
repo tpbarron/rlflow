@@ -1,5 +1,20 @@
 import numpy as np
 
+
+def run_test_episode(env, policy, episode_len=np.inf):
+    episode_itr = 0
+    total_reward = 0.0
+    done = False
+    obs = env.reset()
+    while not done and episode_itr < episode_len:
+        env.render()
+        action = policy.predict(obs)
+        obs, reward, done, info = env.step(action)
+        total_reward += reward
+        episode_itr += 1
+    return total_reward
+
+
 def rollout_env_with_policy(env, policy, episode_len=np.inf):
     """
     Runs environment to completion and returns reward under given policy

@@ -1,0 +1,3 @@
+numpy==1.11.1
+box2d==2.3.2
+keras

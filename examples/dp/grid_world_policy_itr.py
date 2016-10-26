@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import numpy as np
 from gym.envs.toy_text.frozen_lake import FrozenLakeEnv
 from rlcore.policies.tab import TabularPolicy, TabularValue
-from rlcore.algos.dp.pitr import PolicyIteration
+from rlcore.algos.dp import PolicyIteration
 
 
 def run():

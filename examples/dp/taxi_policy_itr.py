@@ -5,16 +5,12 @@ from __future__ import absolute_import
 import numpy as np
 import gym
 from rlcore.policies.tab import TabularPolicy
-from rlcore.algos.td.tdlmda import TDLambda
-from rlcore.algos.dp.pitr import PolicyIteration
+from rlcore.algos.dp import PolicyIteration
 
 
 def run():
     env = gym.make('Taxi-v1')
     print ("Observation space:", env.observation_space.n)
-
-    # tdlmda = TDLambda(env, 0)
-    # tdlmda.iterate(1, episode_len=np.inf)
 
     policy = TabularPolicy(env.observation_space.n)
     pitr = PolicyIteration(env, policy)
