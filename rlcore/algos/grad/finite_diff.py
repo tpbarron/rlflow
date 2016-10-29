@@ -16,7 +16,8 @@ class FiniteDifference:
             num_variations = self.num_passes * self.num_weights
 
         # run episode with initial weights to get J_ref
-        J_ref = rl_utils.rollout_env_with_policy(self.env, policy, episode_len=episode_len)
+        ep_states, ep_raw_actions, ep_processed_actions, ep_rewards = rl_utils.rollout_env_with_policy(self.env, policy, episode_len=episode_len)
+        J_ref = sum(ep_rewards)
 
         deltaJs = np.empty((self.num_passes*self.num_weights,))
         deltaTs = np.empty((self.num_passes*self.num_weights, self.num_weights))

@@ -17,6 +17,9 @@ class LinearApproximator(FunctionApproximator):
 
 
     def get_weight_variation(self, stdcoef=1.0, dist='gaussian'):
+        """
+        Used for FiniteDifference optimization
+        """
         # define distribution based on given weights
         mu, sigma = 0.0, stdcoef*np.std(self.w)
         deltas = np.random.normal(mu, sigma, self.w.shape)
@@ -35,6 +38,4 @@ class LinearApproximator(FunctionApproximator):
 
     def predict(self, input):
         p = np.dot(self.w, input)
-        if (self.prediction_postprocessor is not None):
-            p = self.prediction_postprocessor(p)
         return p
