@@ -13,7 +13,7 @@ class PolicyGradient:
         self.env = env
 
 
-    def discount_rewards(self, r, gamma=0.9):
+    def discount_rewards(self, r, gamma=0.99):
         """ take 1D float array of rewards and compute discounted reward """
         discounted_r = np.zeros_like(r)
         running_add = 0
@@ -32,8 +32,10 @@ class PolicyGradient:
         ep_dlogps = []
 
         for i in range(len(ep_states)):
-            y = 1 if ep_processed_actions[i] == 2 else 0 # a "fake label"
-            ep_dlogps.append(y - ep_raw_actions[i])
+            y = np.zeros([self.env.action_space.n])
+            y[ep_processed_actions[i]] = 1
+            # y = 1 if ep_processed_actions[i] == 2 else 0 # a "fake label"
+            ep_dlogps.append(y) # - float(ep_raw_actions[i]))
 
         # stack together all inputs, action gradients, and rewards for this episode
         epx = np.vstack(ep_states)

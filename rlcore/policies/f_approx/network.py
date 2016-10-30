@@ -15,8 +15,10 @@ class Network(FunctionApproximator):
 
     def predict(self, input):
         input = input[np.newaxis,:]
-        out = self.keras_model.predict(input)
-        return out
+        out = self.keras_model.predict(input, batch_size=1).flatten()
+        action = np.random.choice(6, 1, p=out/np.sum(out))[0]
+        return action
+        # return out
 
 
     def update(self, gradient):
