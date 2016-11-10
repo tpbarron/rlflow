@@ -63,6 +63,21 @@ def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbos
     return ep_states, ep_raw_actions, ep_processed_actions, ep_rewards
 
 
+
+def discount_rewards(r, gamma=0.99):
+    """ take 1D float array of rewards and compute discounted reward """
+    discounted_r = np.zeros_like(r)
+    for t in xrange(r.size):
+        discounted_r[t] = r[t] * gamma ** t
+    return discounted_r
+
+    # running_add = 0
+    # for t in reversed(xrange(0, r.size)):
+    #     if r[t] != 0: running_add = 0 # reset the sum, since this was a game boundary (pong specific!)
+    #     running_add = running_add * gamma + r[t]
+    #     discounted_r[t] = running_add
+    # return discounted_r
+
 #
 # prediction pre processors
 #
@@ -97,9 +112,31 @@ def sign(x):
         return 1
 
 
+def cast_int(x):
+    return int(x)
+
+
+
+
+#
+# Probability operators
+#
 
 def prob(x):
+    assert (type(x) == np.ndarray and len(x) == 1) or type(x) == float
     return 0 if np.random.uniform() < x else 1
+
+
+def sample(x):
+    assert (type(x) == np.ndarray)
+    x = np.squeeze(x)
+    assert x.ndim == 1
+    # print (x)
+    # renormalize to avoid 'does not sum to 1 errors'
+    # x /= x.sum()
+    # print (np.random.choice(len(x), 1, p=x/x.sum()))
+    return np.random.choice(len(x), 1, p=x/x.sum())
+
 
 def sample_outputs(x):
     """
@@ -113,10 +150,6 @@ def sample_outputs(x):
     prob_vec = np.vectorize(prob, otypes=[np.int32])
     sampled = prob_vec(x)
     return sampled
-
-
-def cast_int(x):
-    return int(x)
 
 
 def pong_outputs(x):

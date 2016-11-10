@@ -4,8 +4,8 @@ from rlcore.policies.policy import Policy
 
 class FunctionApproximator(Policy):
 
-    def __init__(self):
-        pass
+    def __init__(self, model):
+        self.model = model
 
 
     def get_num_weights(self):

@@ -8,16 +8,16 @@ from rlcore.policies.f_approx.f_approximator import FunctionApproximator
 class Network(FunctionApproximator):
 
     def __init__(self, keras_model, prediction_preprocessors=None, prediction_postprocessors=None):
-        self.keras_model = keras_model
+        super(Network, self).__init__(keras_model)
         self.prediction_preprocessors = prediction_preprocessors
         self.prediction_postprocessors = prediction_postprocessors
 
 
     def predict(self, input):
         input = input[np.newaxis,:]
-        out = self.keras_model.predict(input, batch_size=1).flatten()
-        action = np.random.choice(6, 1, p=out/np.sum(out))[0]
-        return action
+        return self.model.predict(input) #.flatten()
+        # action = np.random.choice(6, 1, p=out/np.sum(out))[0]
+        # return action
         # return out
 
 

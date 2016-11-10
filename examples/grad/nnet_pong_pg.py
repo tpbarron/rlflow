@@ -17,13 +17,12 @@ if __name__ == "__main__":
     model = Sequential()
     model.add(Dense(200, input_dim=6400, activation='relu'))
     model.add(Dense(env.action_space.n, activation='sigmoid'))
-    model.compile(loss='mse', optimizer='rmsprop')
     network = Network(model, prediction_preprocessors=[rl_utils.prepro]) #,
                             #  prediction_postprocessors=[rl_utils.sample_outputs]) #,
                                                         # rl_utils.cast_int,
                                                         # rl_utils.pong_outputs])
 
-    pg = PolicyGradient(env)
+    pg = PolicyGradient(env, network)
 
     max_itr = 2500
     max_episode_len = np.inf

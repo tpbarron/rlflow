@@ -11,59 +11,27 @@ def stddev(x):
         (tf.sub(x, tf.fill(x.get_shape(), tf.reduce_mean(x)))))))
 
 
-#
-# Neural network layers
-#
+optimizer_map = {
+    'sgd': tf.train.GradientDescentOptimizer(0.01),
+    'adadelta': tf.train.AdadeltaOptimizer(),
+    'adagrad': tf.train.AdagradOptimizer(0.01),
+    'adagradda': tf.train.AdagradDAOptimizer(0.01),
+    'momentum': tf.train.MomentumOptimizer(0.01, 0.01),
+    'adam': tf.train.AdamOptimizer(),
+    'ftrl': tf.train.FtrlOptimizer(0.01),
+    'rmsprop': tf.train.RMSPromOptimizer(0.001),
+}
 
-def fc():
+def optimizer_from_str(o):
     """
-    Fully connected layer
+    Return a TF optimizer given its name
+
+    o = [sgd|adadelta|adagrad|adagradda|momentum|adam|ftrl|rmsprop]
     """
-    pass
+    if (o in optimizer_map):
+        return optimizer_map[o]
+    raise KeyError('Invalid optimizer type: ' + str(o))
 
-
-def conv():
-    """
-    Convolutional layer
-    """
-    pass
-
-
-#
-# Network activations
-#
-
-def relu():
-    """
-    Rectified Linear activation
-    """
-    pass
-
-
-def softmax():
-    """
-    Softmax activation
-    """
-    pass
-
-
-def tanh():
-    """
-    Hyperbolic tangent activation
-    """
-    pass
-
-
-#
-# Layer normalization
-#
-
-def batch_normalization():
-    """
-
-    """
-    pass
-    
 
 if __name__ == "__main__":
     x = tf.constant([2,4,4,4,5,5,7,9])

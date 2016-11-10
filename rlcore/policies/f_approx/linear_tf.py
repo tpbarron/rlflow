@@ -6,18 +6,18 @@ from .f_approximator import FunctionApproximator
 
 class LinearApproximator(FunctionApproximator):
 
-    def __init__(self, n, m, lr=0.1, weight_variance=1.0):
+    def __init__(self, in_d, out_d, lr=0.1, weight_variance=1.0):
         super(LinearApproximator, self).__init__()
-        self.n = n # input dim
-        self.m = m # output dim
+        self.in_d = in_d # input dim
+        self.out_d = out_d # output dim
 
         self.lr = tf.constant(lr, shape=[1], name="learning_rates")
-        self.W = tf.Variable(tf.random_normal([m, n], 0.0, weight_variance), name="W")
-        self.Wbackup = tf.Variable(tf.zeros([m, n]), name="Wbackup")
+        self.W = tf.Variable(tf.random_normal([out_d, in_d], 1.0, weight_variance), name="W")
+        self.Wbackup = tf.Variable(tf.zeros([out_d, in_d]), name="Wbackup")
 
-        self.deltas = tf.placeholder(tf.float32, [m, n], name="deltas")
-        self.grad = tf.placeholder(tf.float32, [m, n], name="grad")
-        self.obs = tf.placeholder(tf.float32, [n, 1], name="obs")
+        self.deltas = tf.placeholder(tf.float32, [out_d, in_d], name="deltas")
+        self.grad = tf.placeholder(tf.float32, [out_d, in_d], name="grad")
+        self.obs = tf.placeholder(tf.float32, [in_d, 1], name="obs")
 
         self.f_weight_backup = self.Wbackup.assign(self.W)
         self.f_weight_restore = self.W.assign(self.Wbackup)
