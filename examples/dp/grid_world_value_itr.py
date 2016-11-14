@@ -1,30 +1,20 @@
 from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 
 import numpy as np
 from gym.envs.toy_text.frozen_lake import FrozenLakeEnv
 from rlcore.policies.tab import TabularPolicy, TabularValue
 from rlcore.algos.dp import ValueIteration
-
-def run():
-    env = FrozenLakeEnv(map_name="8x8", is_slippery=False)
-    policy = TabularValue(env.observation_space.n)
-    vitr = ValueIteration(env, policy)
-    det_pol = vitr.iterate()
-    det_pol.prettyprint()
-
-    done = False
-    total_reward = 0.0
-    state = env.reset()
-    while not done:
-        action = det_pol.get_action(state)
-        state, reward, done, info = env.step(action)
-        total_reward += reward
-        # print ("State: ", state, ", Action: ", action, ", Reward = ", total_reward)
-
-    print ("Total reward: ", total_reward)
-
+from rlcore.core import rl_utils
 
 if __name__ == "__main__":
-    run()
+    env = FrozenLakeEnv(map_name="8x8", is_slippery=False)
+    policy = TabularValue(env.observation_space, env.action_space)
+    vitr = ValueIteration(env, policy)
+
+    # get back a deterministic policy from the value iteration
+    deterministic_policy = vitr.iterate()
+    deterministic_policy.prettyprint()
+    deterministic_policy.prediction_postprocessors = [rl_utils.cast_int]
+
+    total_reward = rl_utils.run_test_episode(env, deterministic_policy)
+    print ("Total reward: ", total_reward)

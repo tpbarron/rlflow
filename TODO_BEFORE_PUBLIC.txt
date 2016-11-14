@@ -1,4 +1,6 @@
 To Fix:
+* Unify policy iter / value iter with optimize()/ train() organization
+* Update TDLambda to have arbitrary policy? 
 * broken bandit env
 
 Misc:
@@ -17,6 +19,8 @@ Add gradient methods
 * Reinforce policy gradient
 * Natural policy gradient
 * Deterministic policy gradient
+* A3C
+* Policy Grad Q learning
 
 Well written readme and docs
 
@@ -32,7 +36,7 @@ General Project Outline:
   * dp
     * value iteration - http://www.cs.ubc.ca/~poole/demos/mdp/vi.html
     * policy iteration
-  * TD 
+  * TD
     * TD(lambda)
     * Q-learning
     * SARSA

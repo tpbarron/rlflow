@@ -12,7 +12,7 @@ class PolicyIteration(object):
     def __init__(self, env, policy, discount=0.9, delta_thresh=0.1):
         self.env = env
         self.policy = policy
-        self.values = TabularValue(env.observation_space.n)
+        self.values = TabularValue(env.observation_space, env.action_space)
         self.discount = discount
         self.delta_thresh = delta_thresh
 

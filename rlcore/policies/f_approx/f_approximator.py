@@ -4,7 +4,8 @@ from rlcore.policies.policy import Policy
 
 class FunctionApproximator(Policy):
 
-    def __init__(self, model):
+    def __init__(self, model, **kwargs):
+        super(FunctionApproximator, self).__init__(**kwargs)
         self.model = model
 
 

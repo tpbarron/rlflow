@@ -1,13 +1,20 @@
 import numpy as np
+from rlcore.policies.policy import Policy
 
+def run_test_episode(env, policy, episode_len=np.inf, render=False):
+    """
+    Run an episode and return the reward, changes mode to Policy.TEST
+    """
+    init_mode = policy.mode
+    policy.mode = Policy.TEST
 
-def run_test_episode(env, policy, episode_len=np.inf):
     episode_itr = 0
     total_reward = 0.0
     done = False
     obs = env.reset()
     while not done and episode_itr < episode_len:
-        env.render()
+        if (render): env.render()
+
         if (policy.prediction_preprocessors is not None):
             for preprocessor in policy.prediction_preprocessors:
                 obs = preprocessor(obs)
@@ -20,10 +27,23 @@ def run_test_episode(env, policy, episode_len=np.inf):
 
         total_reward += reward
         episode_itr += 1
+
+    policy.mode = init_mode
     return total_reward
 
 
-def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbose=True):
+def average_test_episodes(env, policy, n_episodes, episode_len=np.inf):
+    """
+    Run n_episodes of the environment with the given policy and return the
+    average reward over the episodes
+    """
+    total = 0.0
+    for i in range(n_episodes):
+        total += run_test_episode(env, policy, episode_len=episode_len)
+    return total / n_episodes
+
+
+def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbose=False):
     """
     Runs environment to completion and returns reward under given policy
     """
@@ -131,10 +151,8 @@ def sample(x):
     assert (type(x) == np.ndarray)
     x = np.squeeze(x)
     assert x.ndim == 1
-    # print (x)
     # renormalize to avoid 'does not sum to 1 errors'
     # x /= x.sum()
-    # print (np.random.choice(len(x), 1, p=x/x.sum()))
     return np.random.choice(len(x), 1, p=x/x.sum())
 
 

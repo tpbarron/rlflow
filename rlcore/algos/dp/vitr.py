@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import absolute_import
 
 import numpy as np
+import copy
 from rlcore.policies.tab import TabularPolicy
 
 
@@ -22,7 +23,7 @@ class ValueIteration(object):
         # for each state, s, in environment
         while True:
             delta = 0.0
-            values_copy = np.copy(self.policy.values)
+            values_copy = copy.deepcopy(self.policy.values)
             for s in range(self.env.observation_space.n):
                 max_a = 0.0
                 # for each possible action a
@@ -48,8 +49,8 @@ class ValueIteration(object):
                 break
 
         # genrate deterministic policy
-        det_pol = TabularPolicy(self.env.observation_space.n)
+        det_pol = TabularPolicy(self.env.observation_space, self.env.action_space)
         for s in range(self.env.observation_space.n):
-            action = self.policy.get_action(self.env.P[s])
+            action = self.policy.get_action(s) #self.env.P[s])
             det_pol.set_action(s, action)
         return det_pol

@@ -7,19 +7,10 @@ from rlcore.policies.f_approx.f_approximator import FunctionApproximator
 
 class Network(FunctionApproximator):
 
-    def __init__(self, keras_model, prediction_preprocessors=None, prediction_postprocessors=None):
-        super(Network, self).__init__(keras_model)
-        self.prediction_preprocessors = prediction_preprocessors
-        self.prediction_postprocessors = prediction_postprocessors
+    def __init__(self, keras_model, **kwargs):
+        super(Network, self).__init__(keras_model, **kwargs)
 
 
     def predict(self, input):
         input = input[np.newaxis,:]
-        return self.model.predict(input) #.flatten()
-        # action = np.random.choice(6, 1, p=out/np.sum(out))[0]
-        # return action
-        # return out
-
-
-    def update(self, gradient):
-        pass
+        return self.model.predict(input)

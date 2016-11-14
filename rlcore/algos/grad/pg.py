@@ -28,13 +28,14 @@ class PolicyGradient(RLGradientAlgorithm):
         self.rewards = tf.placeholder(tf.float32, shape=(None))
         self.probs = self.policy.model(self.states)
 
-        self.logprobs = tf.log(tf.reduce_sum(tf.mul(self.probs, self.actions), reduction_indices=[1]))
+        self.action_probs = tf.mul(self.probs, self.actions)
+        self.reduced_action_probs = tf.reduce_sum(self.action_probs, reduction_indices=[1])
+        self.logprobs = tf.log(self.reduced_action_probs)
         self.eligibility = self.logprobs * self.rewards
         self.L = -tf.reduce_sum(self.eligibility)
-        # self.L = -tf.reduce_sum(tf.mul(tf.mul(tf.log(self.probs), self.actions), self.rewards))
 
         # TODO: gen optimizer based on param
-        self.opt = tf.train.AdamOptimizer(0.01).minimize(self.L)
+        self.opt = tf.train.AdamOptimizer(0.005).minimize(self.L)
 
         # do gradient update separately so do apply custom function to gradients?
         # self.grads_and_vars = self.opt.compute_gradients(self.L)
@@ -49,16 +50,17 @@ class PolicyGradient(RLGradientAlgorithm):
                                                                                                        self.policy,
                                                                                                        episode_len=self.episode_len)
 
-        # print ("Actions: ", ep_processed_actions)
-        # print ("States: ", ep_states)
-        # print ("Rewards: ", ep_rewards)
-        if (self.discount):
+        # print ("raw actions: ", ep_raw_actions)
+        # print ("processed actions: ", ep_processed_actions)
+
+        if self.discount:
             ep_rewards = rl_utils.discount_rewards(np.array(ep_rewards))
 
         formatted_actions = np.zeros((len(ep_raw_actions), 2))
         for i in range(len(ep_processed_actions)):
-            formatted_actions[ep_processed_actions[i]] = 1.0
+            formatted_actions[i][ep_processed_actions[i]] = 1.0
 
+        # formatted_rewards = ep_rewards
         formatted_rewards = np.zeros((len(ep_rewards),))
         # R_t is the reward from time t to the end
         running_sum = 0.0
@@ -69,9 +71,30 @@ class PolicyGradient(RLGradientAlgorithm):
         formatted_rewards -= np.mean(formatted_rewards)
         formatted_rewards /= np.std(formatted_rewards)
 
+        # print ("formatted_actions: ", formatted_actions)
+        # print ("States: ", ep_states)
+        # print ("Rewards: ", formatted_rewards)
+        #
+        # probs = self.sess.run(self.action_probs, feed_dict={self.actions: formatted_actions,
+        #                            self.states: ep_states,
+        #                            self.rewards: formatted_rewards})
+        #
+        # print ("Probs: ", probs)
+        # print ("Reduced: ", self.sess.run(self.reduced_action_probs, feed_dict={self.actions: formatted_actions,
+        #                            self.states: ep_states,
+        #                            self.rewards: formatted_rewards}))
+        # print ("logprobs: ", self.sess.run(self.logprobs, feed_dict={self.actions: formatted_actions,
+        #                            self.states: ep_states,
+        #                            self.rewards: formatted_rewards}))
+        # print ("eligibility: ", self.sess.run(self.eligibility, feed_dict={self.actions: formatted_actions,
+        #                            self.states: ep_states,
+        #                            self.rewards: formatted_rewards}))
         self.sess.run(self.opt, feed_dict={self.actions: formatted_actions,
                                    self.states: ep_states,
                                    self.rewards: formatted_rewards})
+
+        # import sys
+        # sys.exit()
 
         # grad_vals = self.sess.run([g for (g,v) in self.grads_and_vars], feed_dict={self.actions: formatted_actions,
         #                                                                            self.states: ep_states,
