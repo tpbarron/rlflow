@@ -1,9 +1,10 @@
 from __future__ import print_function
 import numpy as np
 
+from rlcore.algos.grad.grad_algo import RLGradientAlgorithm
 from rlcore.core import rl_utils
 
-class FiniteDifference:
+class FiniteDifference(RLGradientAlgorithm):
 
     def __init__(self, env, num_passes=2):
         self.env = env

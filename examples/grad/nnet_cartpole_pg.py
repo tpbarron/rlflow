@@ -19,4 +19,4 @@ if __name__ == "__main__":
     model.add(Dense(env.action_space.n, input_dim=env.observation_space.shape[0], activation='softmax'))
     policy = Network(model, prediction_postprocessors=[rl_utils.sample, rl_utils.cast_int])
     pg = PolicyGradient(env, policy, episode_len=1000, discount=True)
-    pg.train(max_iterations=5000, gym_record=False)
+    pg.train(max_iterations=50000, gym_record=False)

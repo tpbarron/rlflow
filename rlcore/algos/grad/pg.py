@@ -37,14 +37,14 @@ class PolicyGradient(RLGradientAlgorithm):
         # self.summed = tf.reduce_sum(self.multiplied_logprobs_rewards)
 
         # self.L = -self.summed
-        self.L = tf.reduce_sum(tf.mul(self.logprobs, self.rewards))
+        self.L = -tf.reduce_sum(tf.mul(self.logprobs, self.rewards))
 
         # TODO: gen optimizer based on param
-        self.opt = tf.train.AdamOptimizer().minimize(-self.L)
+        self.opt = tf.train.AdamOptimizer().minimize(self.L)
 
         # do gradient update separately so do apply custom function to gradients?
         # self.grads_and_vars = self.opt.compute_gradients(self.L)
-        # self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], -10.0, 10.0), gv[1]) for gv in self.grads_and_vars]
+        # self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], -1.0, 1.0), gv[1]) for gv in self.grads_and_vars]
         # self.update = self.opt.apply_gradients(self.clipped_grads_and_vars)
 
         self.sess = tf.Session()
@@ -61,7 +61,6 @@ class PolicyGradient(RLGradientAlgorithm):
         # print ("Rewards: ", ep_rewards)
 
         if self.discount:
-            # TODO: need to discount for each step!
             ep_rewards = rl_utils.discount_rewards(np.array(ep_rewards))
 
         # print ("Rewards: ", ep_rewards)
@@ -80,8 +79,8 @@ class PolicyGradient(RLGradientAlgorithm):
         # for t in range(len(ep_rewards)-1, -1, -1):
         #     running_sum += ep_rewards[t]
         #     formatted_rewards[t] = running_sum
-        formatted_rewards -= np.mean(formatted_rewards)
-        formatted_rewards /= np.std(formatted_rewards)
+        # formatted_rewards -= np.mean(formatted_rewards)
+        # formatted_rewards /= np.std(formatted_rewards)
 
 
         # print ("formatted_actions: ", formatted_actions)
@@ -108,15 +107,14 @@ class PolicyGradient(RLGradientAlgorithm):
         #                             feed_dict={self.actions: formatted_actions,
         #                                        self.states: ep_states,
         #                                        self.rewards: formatted_rewards}))
+        #
+        # self.sess.run(self.opt, feed_dict={self.actions: formatted_actions,
+        #                                    self.states: ep_states,
+        #                                    self.rewards: formatted_rewards})
 
-        self.sess.run(self.opt, feed_dict={self.actions: formatted_actions,
-                                           self.states: ep_states,
-                                           self.rewards: formatted_rewards})
-
-
-        # self.sess.run(self.update, feed_dict={self.actions: formatted_actions,
-        #                                       self.states: ep_states,
-        #                                       self.rewards: formatted_rewards})
+        self.sess.run(self.update, feed_dict={self.actions: formatted_actions,
+                                              self.states: ep_states,
+                                              self.rewards: formatted_rewards})
 
         # grads = [(self.sess.run(g, feed_dict={self.actions: formatted_actions,
         #                                       self.states: ep_states,

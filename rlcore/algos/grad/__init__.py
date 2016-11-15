@@ -1,2 +1,2 @@
-from finite_diff import FiniteDifference
+from fd import FiniteDifference
 from pg import PolicyGradient
