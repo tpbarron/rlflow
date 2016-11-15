@@ -84,11 +84,19 @@ def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbos
 
 
 
-def discount_rewards(r, gamma=0.99):
-    """ take 1D float array of rewards and compute discounted reward """
+def discount_rewards(r, gamma=0.9):
+    """
+    Take 1D float array of rewards and compute discounted reward
+    """
     discounted_r = np.zeros_like(r)
-    for t in xrange(r.size):
-        discounted_r[t] = r[t] * gamma ** t
+    for i in xrange(r.size):
+        # print (i)
+        rew_sum = 0.0
+        for j in xrange(i, r.size):
+            rew_sum += r[j] * gamma ** j
+        discounted_r[i] = rew_sum
+    # for t in xrange(r.size):
+    #     discounted_r[t] = r[t] * gamma ** t
     return discounted_r
 
     # running_add = 0
