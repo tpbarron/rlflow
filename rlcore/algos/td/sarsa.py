@@ -8,8 +8,7 @@ from rlcore.algos.td.td_algo import RLTDAlgorithm
 class SARSA(RLTDAlgorithm):
 
     def __init__(self, env, policy, step=0.1, discount=0.9, episode_len=np.inf):
-        self.env = env
-        self.policy = policy
+        super(SARSA, self).__init__(env, policy)
         self.step = step
         self.discount = discount
         self.episode_len = episode_len

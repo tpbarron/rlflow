@@ -1,6 +1,28 @@
 import numpy as np
 from rlcore.policies.policy import Policy
 
+
+#
+# Environment rollouts
+#
+
+
+def apply_prediction_preprocessors(policy, obs):
+    print (policy.prediction_preprocessors)
+    if policy.prediction_preprocessors is not None:
+        for preprocessor in policy.prediction_preprocessors:
+            obs = preprocessor(obs)
+    return obs
+
+
+def apply_prediction_postprocessors(policy, action):
+    print (policy.prediction_postprocessors)
+    if policy.prediction_postprocessors is not None:
+        for postprocessor in policy.prediction_postprocessors:
+            action = postprocessor(action)
+    return action
+
+
 def run_test_episode(env, policy, episode_len=np.inf, render=False):
     """
     Run an episode and return the reward, changes mode to Policy.TEST
@@ -13,17 +35,14 @@ def run_test_episode(env, policy, episode_len=np.inf, render=False):
     done = False
     obs = env.reset()
     while not done and episode_itr < episode_len:
-        if (render): env.render()
+        if render:
+            env.render()
 
-        if (policy.prediction_preprocessors is not None):
-            for preprocessor in policy.prediction_preprocessors:
-                obs = preprocessor(obs)
+        obs = apply_prediction_preprocessors(policy, obs)
         action = policy.predict(obs)
-        if (policy.prediction_postprocessors is not None):
-            for postprocessor in policy.prediction_postprocessors:
-                action = postprocessor(action)
+        action = apply_prediction_postprocessors(policy, action)
 
-        obs, reward, done, info = env.step(action)
+        obs, reward, done, _ = env.step(action)
 
         total_reward += reward
         episode_itr += 1
@@ -38,7 +57,7 @@ def average_test_episodes(env, policy, n_episodes, episode_len=np.inf):
     average reward over the episodes
     """
     total = 0.0
-    for i in range(n_episodes):
+    for _ in range(n_episodes):
         total += run_test_episode(env, policy, episode_len=episode_len)
     return total / n_episodes
 
@@ -46,6 +65,8 @@ def average_test_episodes(env, policy, n_episodes, episode_len=np.inf):
 def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbose=False):
     """
     Runs environment to completion and returns reward under given policy
+    Returns the sequence of rewards, states, raw actions (direct from the policy),
+        and processed actions (actions sent to the env)
     """
     ep_rewards = []
     ep_states = []
@@ -57,67 +78,69 @@ def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbos
     obs = env.reset()
     episode_itr = 0
     while not done and episode_itr < episode_len:
-        if (render): env.render()
+        if render:
+            env.render()
 
-        if (policy.prediction_preprocessors is not None):
-            for preprocessor in policy.prediction_preprocessors:
-                obs = preprocessor(obs)
-
-        action = policy.predict(obs)
+        obs = apply_prediction_preprocessors(policy, obs)
         ep_states.append(obs)
+        action = policy.predict(obs)
         ep_raw_actions.append(action)
-
-        if (policy.prediction_postprocessors is not None):
-            for postprocessor in policy.prediction_postprocessors:
-                action = postprocessor(action)
-
+        action = apply_prediction_postprocessors(policy, action)
         ep_processed_actions.append(action)
-        obs, reward, done, info = env.step(action)
+
+        obs, reward, done, _ = env.step(action)
         ep_rewards.append(reward)
 
         episode_itr += 1
 
-    if (verbose):
+    if verbose:
         print ('Game finished, reward: %f' % (sum(ep_rewards)))
 
     return ep_states, ep_raw_actions, ep_processed_actions, ep_rewards
 
 
+#
+# Reward manipulation
+#
 
-def discount_rewards(r, gamma=0.9):
+def discount_rewards(rewards, gamma=0.9):
     """
-    Take 1D float array of rewards and compute discounted reward
+    Take 1D float array of rewards and compute the sum of discounted rewards
+    at each timestep
     """
-    discounted_r = np.zeros_like(r)
-    for i in xrange(r.size):
-        # print (i)
+    discounted_r = np.zeros_like(rewards)
+    for i in xrange(rewards.size):
         rew_sum = 0.0
-        for j in xrange(i, r.size):
-            rew_sum += r[j] * gamma ** j
+        for j in xrange(i, rewards.size):
+            rew_sum += rewards[j] * gamma ** j
         discounted_r[i] = rew_sum
-    # for t in xrange(r.size):
-    #     discounted_r[t] = r[t] * gamma ** t
     return discounted_r
 
-    # running_add = 0
-    # for t in reversed(xrange(0, r.size)):
-    #     if r[t] != 0: running_add = 0 # reset the sum, since this was a game boundary (pong specific!)
-    #     running_add = running_add * gamma + r[t]
-    #     discounted_r[t] = running_add
-    # return discounted_r
+
+def standardize_rewards(rewards):
+    """
+    Subtract the mean and divide by the stddev of the given rewards
+    """
+    rew_mean = np.mean(rewards)
+    rew_std = np.std(rewards)
+    rewards -= rew_mean
+    if rew_std != 0:
+        rewards /= rew_std
+    return rewards
+
 
 #
 # prediction pre processors
 #
-
-def prepro(I):
-  """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
-  I = I[35:195] # crop
-  I = I[::2,::2,0] # downsample by factor of 2
-  I[I == 144] = 0 # erase background (background type 1)
-  I[I == 109] = 0 # erase background (background type 2)
-  I[I != 0] = 1 # everything else (paddles, ball) just set to 1
-  return I.astype(np.float).ravel()
+#
+# def prepro(I):
+#     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
+#     I = I[35:195] # crop
+#     I = I[::2, ::2, 0] # downsample by factor of 2
+#     I[I == 144] = 0 # erase background (background type 1)
+#     I[I == 109] = 0 # erase background (background type 2)
+#     I[I != 0] = 1 # everything else (paddles, ball) just set to 1
+#     return I.astype(np.float).ravel()
 
 
 #
@@ -133,8 +156,9 @@ def sign(x):
     >>> sign(-0.5)
     >>> 0
     """
-    assert (type(x) == np.ndarray and len(x) == 1) or type(x) == float
-    if (x[0] < 0):
+    assert (isinstance(x, np.ndarray) and len(x) == 1) or isinstance(x, np.float32) or isinstance(x, float)
+    x = float(x)
+    if x < 0:
         return 0
     else:
         return 1
@@ -151,16 +175,15 @@ def cast_int(x):
 #
 
 def prob(x):
-    assert (type(x) == np.ndarray and len(x) == 1) or type(x) == float
+    assert (isinstance(x, np.ndarray) and len(x) == 1) or isinstance(x, float)
     return 0 if np.random.uniform() < x else 1
 
 
 def sample(x):
-    assert (type(x) == np.ndarray)
+    assert isinstance(x, np.ndarray)
     x = np.squeeze(x)
     assert x.ndim == 1
     # renormalize to avoid 'does not sum to 1 errors'
-    # x /= x.sum()
     return np.random.choice(len(x), 1, p=x/x.sum())
 
 
@@ -172,15 +195,15 @@ def sample_outputs(x):
     probability x_i/1.0 and 1 and probability 1-(x_i/1.0). The outputs are assumed
     to be between 0 and 1
     """
-    assert type(x) == np.ndarray
+    assert isinstance(x, np.ndarray)
     prob_vec = np.vectorize(prob, otypes=[np.int32])
     sampled = prob_vec(x)
     return sampled
 
 
 def pong_outputs(x):
-    assert type(x) == int
-    if (x == 0):
+    assert isinstance(x, int)
+    if x == 0:
         return 2
     else:
         return 3

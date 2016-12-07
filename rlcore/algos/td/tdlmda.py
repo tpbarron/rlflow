@@ -15,11 +15,13 @@ class TDLambda(RLTDAlgorithm):
 
     def __init__(self,
                  env,
+                 policy,
                  lmda=0.0,
                  discount=0.9,
                  step=0.1,
                  episode_len=np.inf,
                  evaluation_episodes=10):
+        super(TDLambda, self).__init__(env, policy)
         self.env = env
         self.lmda = lmda
         self.discount = discount

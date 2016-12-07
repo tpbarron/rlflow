@@ -21,5 +21,5 @@ class FunctionApproximator(Policy):
         raise NotImplementedError
 
 
-    def predict(self, input):
+    def predict(self, obs):
         raise NotImplementedError

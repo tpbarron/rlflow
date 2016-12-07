@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-import numpy as np
 from gym.envs.toy_text.frozen_lake import FrozenLakeEnv
 from rlcore.policies.tab import TabularActionValue
 from rlcore.algos.td import QLearning

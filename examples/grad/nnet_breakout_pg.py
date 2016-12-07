@@ -1,20 +1,26 @@
 from __future__ import print_function
 
 import gym
-
-from keras.models import Sequential
-from keras.layers import Dense
-
 from rlcore.core import rl_utils
 from rlcore.policies.f_approx import Network
 from rlcore.algos.grad import PolicyGradient
 
+from keras.models import Sequential
+from keras.layers.convolutional import Convolution2D
+from keras.layers.core import Dense, Flatten
+
 if __name__ == "__main__":
-    env = gym.make("CartPole-v0")
+    env = gym.make("Breakout-v0")
 
     model = Sequential()
-    model.add(Dense(4, input_dim=env.observation_space.shape[0], activation='sigmoid'))
+    model.add(Convolution2D(64, 3, 3, border_mode='same',
+                            input_shape=env.observation_space.shape,
+                            activation='relu'))
+    model.add(Convolution2D(64, 3, 3, border_mode='same', activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(1024, activation='sigmoid'))
     model.add(Dense(env.action_space.n, activation='softmax'))
+
     policy = Network(model, prediction_postprocessors=[rl_utils.sample, rl_utils.cast_int])
     pg = PolicyGradient(env, policy, episode_len=1000, discount=True)
     pg.train(max_iterations=5000, gym_record=False)

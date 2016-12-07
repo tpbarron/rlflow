@@ -19,7 +19,7 @@ class FiniteDifference(RLGradientAlgorithm):
         self.episode_len = episode_len
 
         # TODO: compute number of weights in policy model
-        self.num_weights = pass
+        self.num_weights = None
         self.num_variations = self.num_passes * self.num_weights
 
         self.dJs = tf.placeholder(tf.float32,
@@ -44,7 +44,7 @@ class FiniteDifference(RLGradientAlgorithm):
         for i in range(self.num_variations):
             # adjust policy
             # TODO vary weights and apply
-            deltas = pass
+            deltas = None
 
             # run one episode with new policy
             ep_states, ep_raw_actions, ep_processed_actions, ep_rewards = rl_utils.rollout_env_with_policy(self.env,

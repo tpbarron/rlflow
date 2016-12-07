@@ -1,6 +1,6 @@
 To Fix:
 * Unify policy iter / value iter with optimize()/ train() organization
-* Update TDLambda to have arbitrary policy? 
+* Update TDLambda to have arbitrary policy?
 * broken bandit env
 
 Misc:
@@ -46,6 +46,11 @@ General Project Outline:
     * linear
   * tabular
 
+
+Examples
+ * DQN breakout
+ * PolicyGradient pong
+ * CEM 
 
 Standardize rewards at unit normal
 
