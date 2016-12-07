@@ -21,7 +21,6 @@ Add gradient methods
 Well written readme and docs
 
 General Project Outline:
-* Needs optimized tensorflow code so can run on GPU in parallel
 * Algorithms:
   * grad
     * finite difference
