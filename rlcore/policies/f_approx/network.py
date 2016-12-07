@@ -3,14 +3,15 @@ from __future__ import division
 from __future__ import absolute_import
 
 import numpy as np
-from rlcore.policies.f_approx.f_approximator import FunctionApproximator
+import tensorflow as tf
+from .f_approximator import FunctionApproximator
 
 class Network(FunctionApproximator):
 
-    def __init__(self, keras_model, **kwargs):
-        super(Network, self).__init__(keras_model, **kwargs)
+    def __init__(self, input_tensor, model, session, **kwargs):
+        super(Network, self).__init__(input_tensor, model, session, **kwargs)
 
 
-    def predict(self, input):
-        input = input[np.newaxis,:]
-        return self.model.predict(input)
+    def predict(self, x):
+        x = x[np.newaxis,:]
+        return self.sess.run(self.model, feed_dict={self.input_tensor: x})

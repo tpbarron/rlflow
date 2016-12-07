@@ -6,9 +6,8 @@ from rlcore.policies.policy import Policy
 # Environment rollouts
 #
 
-
 def apply_prediction_preprocessors(policy, obs):
-    print (policy.prediction_preprocessors)
+    # print (policy.prediction_preprocessors)
     if policy.prediction_preprocessors is not None:
         for preprocessor in policy.prediction_preprocessors:
             obs = preprocessor(obs)
@@ -16,7 +15,7 @@ def apply_prediction_preprocessors(policy, obs):
 
 
 def apply_prediction_postprocessors(policy, action):
-    print (policy.prediction_postprocessors)
+    # print (policy.prediction_postprocessors)
     if policy.prediction_postprocessors is not None:
         for postprocessor in policy.prediction_postprocessors:
             action = postprocessor(action)

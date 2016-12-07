@@ -13,30 +13,12 @@ def stddev(x):
 
 
 #
-# Tensorflow convenience ops
+# Get input tensor shape from env obs space
 #
-
-optimizer_map = {
-    'sgd': tf.train.GradientDescentOptimizer(0.01),
-    'adadelta': tf.train.AdadeltaOptimizer(),
-    'adagrad': tf.train.AdagradOptimizer(0.01),
-    'adagradda': tf.train.AdagradDAOptimizer(0.01, 0),
-    'momentum': tf.train.MomentumOptimizer(0.01, 0.01),
-    'adam': tf.train.AdamOptimizer(),
-    'ftrl': tf.train.FtrlOptimizer(0.01),
-    'rmsprop': tf.train.RMSPropOptimizer(0.001),
-}
-
-def optimizer_from_str(o):
-    """
-    Return a TF optimizer given its name
-
-    o = [sgd|adadelta|adagrad|adagradda|momentum|adam|ftrl|rmsprop]
-    """
-    if (o in optimizer_map):
-        return optimizer_map[o]
-    raise KeyError('Invalid optimizer type: ' + str(o) + ', choose from ' + str(optimizer_map.keys()))
-
+def get_input_tensor_shape(env):
+    obs_shape = tuple([None]+list(env.observation_space.shape))
+    return obs_shape
+    
 
 #
 # Tensorflow decorators

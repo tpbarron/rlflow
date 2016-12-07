@@ -8,15 +8,11 @@ Misc:
 * logging functionality for tensorboard
 * parallel env rollouts for batch policies
 
-Add function approximators
-* Arbitrary neural network
-
 Add linear methods:
 * RBF
 
 Add gradient methods
 * Cross entropy
-* Reinforce policy gradient
 * Natural policy gradient
 * Deterministic policy gradient
 * A3C
@@ -40,17 +36,12 @@ General Project Outline:
     * TD(lambda)
     * Q-learning
     * SARSA
-* Policies
-  * Approximators
-    * neural network
-    * linear
-  * tabular
 
 
 Examples
  * DQN breakout
  * PolicyGradient pong
- * CEM 
+ * CEM
 
 Standardize rewards at unit normal
 

@@ -27,5 +27,5 @@ class Policy(object):
         raise NotImplementedError
 
 
-    def predict(self, input):
+    def predict(self, x):
         raise NotImplementedError

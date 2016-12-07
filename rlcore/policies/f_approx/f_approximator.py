@@ -4,9 +4,11 @@ from rlcore.policies.policy import Policy
 
 class FunctionApproximator(Policy):
 
-    def __init__(self, model, **kwargs):
+    def __init__(self, input_tensor, model, session, **kwargs):
         super(FunctionApproximator, self).__init__(**kwargs)
+        self.input_tensor = input_tensor
         self.model = model
+        self.sess = session
 
 
     def get_num_weights(self):

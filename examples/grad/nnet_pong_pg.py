@@ -1,35 +1,45 @@
 from __future__ import print_function
 
-import sys
-import numpy as np
-
 import gym
+import tensorflow as tf
+import tflearn
 from rlcore.core import rl_utils
+from rlcore.core import tf_utils
 from rlcore.policies.f_approx import Network
 from rlcore.algos.grad import PolicyGradient
-
-from keras.models import Sequential
-from keras.layers import Dense
 
 if __name__ == "__main__":
     env = gym.make("Pong-v0")
 
-    model = Sequential()
-    model.add(Dense(200, input_dim=6400, activation='relu'))
-    model.add(Dense(env.action_space.n, activation='sigmoid'))
-    network = Network(model, prediction_preprocessors=[rl_utils.prepro]) #,
-                            #  prediction_postprocessors=[rl_utils.sample_outputs]) #,
-                                                        # rl_utils.cast_int,
-                                                        # rl_utils.pong_outputs])
+    with tf.Session() as sess:
+        # Build neural network
+        input_tensor = tflearn.input_data(shape=tf_utils.get_input_tensor_shape(env))
+        net = tflearn.conv_2d(input_tensor, 32, 8, strides=1, activation='relu')
+        net = tflearn.conv_2d(input_tensor, 64, 4, strides=1, activation='relu')
+        net = tflearn.flatten(net)
+        net = tflearn.fully_connected(net, 1024, activation='sigmoid')
+        net = tflearn.fully_connected(net, env.action_space.n, activation='softmax')
 
-    pg = PolicyGradient(env, network)
+        # initialize policy with network
+        policy = Network(input_tensor,
+                         net,
+                         sess,
+                         prediction_postprocessors=[rl_utils.sample, rl_utils.cast_int])
 
-    max_itr = 2500
-    max_episode_len = np.inf
-    for i in range(max_itr):
-        print ("Episode: ", i)
-        pg.optimize(network, episode_len=max_episode_len)
+        # initialize algorithm with env, policy, session and other params
+        pg = PolicyGradient(env,
+                            policy,
+                            session=sess,
+                            episode_len=1000,
+                            discount=True,
+                            optimizer='adam')
 
-        if (i % 100 == 0):
-            reward = rl_utils.run_test_episode(env, network, episode_len=max_episode_len)
-            print ("Reward: " + str(reward) + ", on iteration " + str(i))
+        # start the training process
+        pg.train(max_iterations=5000, gym_record=False)
+
+        # see what we have learned
+        average_reward = rl_utils.average_test_episodes(env,
+                                                        policy,
+                                                        10,
+                                                        episode_len=pg.episode_len)
+        print ("Average: ", average_reward)
