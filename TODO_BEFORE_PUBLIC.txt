@@ -4,9 +4,10 @@ To Fix:
 * broken bandit env
 
 Misc:
-* tensorflow cleanup
 * logging functionality for tensorboard
 * parallel env rollouts for batch policies
+* need to be able to define an input / ouput preprocessor
+    so that one can easily define how the env observation get's handled over time
 
 Add linear methods:
 * RBF
