@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import tensorflow as tf
 
 
@@ -18,7 +20,7 @@ def stddev(x):
 def get_input_tensor_shape(env):
     obs_shape = tuple([None]+list(env.observation_space.shape))
     return obs_shape
-    
+
 
 #
 # Tensorflow decorators
@@ -39,7 +41,7 @@ def wrap_session(f):
 if __name__ == "__main__":
     x = tf.constant([2,4,4,4,5,5,7,9])
     print (x)
-    print type(x)
+    print (type(x))
     sess = tf.Session()
-    print sess.run(tf.fill(x.get_shape(), tf.reduce_mean(x)))
-    print sess.run(stddev(x))
+    print (sess.run(tf.fill(x.get_shape(), tf.reduce_mean(x))))
+    print (sess.run(stddev(x)))

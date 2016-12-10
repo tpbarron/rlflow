@@ -5,8 +5,7 @@ class ExperienceReplay(object):
 
     SARS = collections.namedtuple('SARS', ['S1', 'A', 'R', 'S2'])
 
-    def __init__(self,
-                 size=1000000):
+    def __init__(self, size=1000000):
         self.size = size
         self.memory = []
 
@@ -15,9 +14,11 @@ class ExperienceReplay(object):
         """
         Add an element to the back of the memory
         Removes an element from the front if full
+
+        e is a list [s0, a, r, s1]
         """
         # check if at max size
-        if (len(self.memory) ==  self.size):
+        if (len(self.memory) == self.size):
             self.memory.pop(0)
 
         sars = ExperienceReplay.SARS(e[0], e[1], e[2], e[3])

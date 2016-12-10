@@ -61,41 +61,41 @@ def average_test_episodes(env, policy, n_episodes, episode_len=np.inf):
     return total / n_episodes
 
 
-def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbose=False):
-    """
-    Runs environment to completion and returns reward under given policy
-    Returns the sequence of rewards, states, raw actions (direct from the policy),
-        and processed actions (actions sent to the env)
-    """
-    ep_rewards = []
-    ep_states = []
-    ep_raw_actions = []
-    ep_processed_actions = []
-
-    # episode_reward = 0.0
-    done = False
-    obs = env.reset()
-    episode_itr = 0
-    while not done and episode_itr < episode_len:
-        if render:
-            env.render()
-
-        obs = apply_prediction_preprocessors(policy, obs)
-        ep_states.append(obs)
-        action = policy.predict(obs)
-        ep_raw_actions.append(action)
-        action = apply_prediction_postprocessors(policy, action)
-        ep_processed_actions.append(action)
-
-        obs, reward, done, _ = env.step(action)
-        ep_rewards.append(reward)
-
-        episode_itr += 1
-
-    if verbose:
-        print ('Game finished, reward: %f' % (sum(ep_rewards)))
-
-    return ep_states, ep_raw_actions, ep_processed_actions, ep_rewards
+# def rollout_env_with_policy(env, policy, episode_len=np.inf, render=True, verbose=False):
+#     """
+#     Runs environment to completion and returns reward under given policy
+#     Returns the sequence of rewards, states, raw actions (direct from the policy),
+#         and processed actions (actions sent to the env)
+#     """
+#     ep_rewards = []
+#     ep_states = []
+#     ep_raw_actions = []
+#     ep_processed_actions = []
+#
+#     # episode_reward = 0.0
+#     done = False
+#     obs = env.reset()
+#     episode_itr = 0
+#     while not done and episode_itr < episode_len:
+#         if render:
+#             env.render()
+#
+#         obs = apply_prediction_preprocessors(policy, obs)
+#         ep_states.append(obs)
+#         action = policy.predict(obs)
+#         ep_raw_actions.append(action)
+#         action = apply_prediction_postprocessors(policy, action)
+#         ep_processed_actions.append(action)
+#
+#         obs, reward, done, _ = env.step(action)
+#         ep_rewards.append(reward)
+#
+#         episode_itr += 1
+#
+#     if verbose:
+#         print ('Game finished, reward: %f' % (sum(ep_rewards)))
+#
+#     return ep_states, ep_raw_actions, ep_processed_actions, ep_rewards
 
 
 #
@@ -108,9 +108,9 @@ def discount_rewards(rewards, gamma=0.9):
     at each timestep
     """
     discounted_r = np.zeros_like(rewards)
-    for i in xrange(rewards.size):
+    for i in range(rewards.size):
         rew_sum = 0.0
-        for j in xrange(i, rewards.size):
+        for j in range(i, rewards.size):
             rew_sum += rewards[j] * gamma ** j
         discounted_r[i] = rew_sum
     return discounted_r

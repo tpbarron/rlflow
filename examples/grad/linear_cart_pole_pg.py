@@ -26,9 +26,9 @@ if __name__ == "__main__":
                                         prediction_postprocessors=[rl_utils.sample, rl_utils.cast_int])
         pg = PolicyGradient(env,
                             lin_approx,
-                            session=sess,
+                            sess,
                             episode_len=100,
-                            discount=True,
+                            discount=0.9,
                             optimizer='adam')
 
         pg.train(max_iterations=1000, gym_record=False)
