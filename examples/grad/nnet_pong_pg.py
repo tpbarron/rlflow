@@ -13,17 +13,18 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
         # Build neural network
-        input_tensor = tflearn.input_data(shape=tf_utils.get_input_tensor_shape(env))
-        net = tflearn.conv_2d(input_tensor, 32, 8, strides=1, activation='relu')
-        net = tflearn.conv_2d(input_tensor, 64, 4, strides=1, activation='relu')
+        input_tensor = tflearn.input_data(shape=[None, 80, 80, 1]) #tf_utils.get_input_tensor_shape(env))
+        net = tflearn.conv_2d(input_tensor, 16, 4, strides=2, activation='relu')
+        # net = tflearn.conv_2d(input_tensor, 64, 4, strides=2, activation='relu')
         net = tflearn.flatten(net)
-        net = tflearn.fully_connected(net, 1024, activation='sigmoid')
+        net = tflearn.fully_connected(net, 16, activation='sigmoid')
         net = tflearn.fully_connected(net, env.action_space.n, activation='softmax')
 
         # initialize policy with network
         policy = Network(input_tensor,
                          net,
                          sess,
+                         prediction_preprocessors=[rl_utils.prepro],
                          prediction_postprocessors=[rl_utils.sample, rl_utils.cast_int])
 
         # initialize algorithm with env, policy, session and other params
