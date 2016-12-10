@@ -4,9 +4,9 @@ import sys
 import numpy as np
 
 import gym
-from rlcore.core import rl_utils
-from rlcore.policies.f_approx import LinearApproximator
-from rlcore.algos.grad import FiniteDifference
+from markov.core import rl_utils
+from markov.policies.f_approx import LinearApproximator
+from markov.algos.grad import FiniteDifference
 
 if __name__ == "__main__":
     env = gym.make("CartPole-v0")

@@ -3,8 +3,8 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from rlcore.core import rl_utils
-from rlcore.algos.grad.grad_algo import RLGradientAlgorithm
+from markov.core import rl_utils
+from markov.algos.grad.grad_algo import RLGradientAlgorithm
 
 
 class NaturalPG(RLGradientAlgorithm):
@@ -38,7 +38,7 @@ class NaturalPG(RLGradientAlgorithm):
         # fisher matrix
         self.F = tf.mul(self.logprobs, tf.transpose(self.logprobs))
 
-        
+
 
         # TODO: gen optimizer based on param
         self.opt = tf.train.AdamOptimizer(0.005).minimize(self.L)

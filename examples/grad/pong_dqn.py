@@ -4,12 +4,12 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from rlcore.core import rl_utils
-from rlcore.core import tf_utils
-from rlcore.policies.f_approx import Network
-from rlcore.algos.grad.dqn import DQN
-from rlcore.memories.experience_replay import ExperienceReplay
-from rlcore.exploration.egreedy import EpsilonGreedy
+from markov.core import rl_utils
+from markov.core import tf_utils
+from markov.policies.f_approx import Network
+from markov.algos.grad.dqn import DQN
+from markov.memories.experience_replay import ExperienceReplay
+from markov.exploration.egreedy import EpsilonGreedy
 
 if __name__ == "__main__":
     env = gym.make("Pong-v0")

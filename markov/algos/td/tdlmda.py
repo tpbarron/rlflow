@@ -3,10 +3,10 @@ from __future__ import division
 from __future__ import absolute_import
 
 import numpy as np
-from rlcore.algos.td.td_algo import RLTDAlgorithm
-from rlcore.policies.tab import TabularValue
-from rlcore.policies.tab import TabularPolicy
-from rlcore.core import rl_utils
+from markov.algos.td.td_algo import RLTDAlgorithm
+from markov.policies.tab import TabularValue
+from markov.policies.tab import TabularPolicy
+from markov.core import rl_utils
 
 class TDLambda(RLTDAlgorithm):
     """

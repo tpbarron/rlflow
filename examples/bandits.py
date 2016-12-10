@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from rlcore.envs.n_bandits_env import NBanditsEnv
-from rlcore.algos.value_methods import EpsilonGreedy, SoftmaxActionSelection
+from markov.envs.n_bandits_env import NBanditsEnv
+from markov.algos.value_methods import EpsilonGreedy, SoftmaxActionSelection
 
 
 def train_bandit(env, num_episodes, value_method, save_checkpoints=True, data=None):

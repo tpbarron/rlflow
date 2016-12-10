@@ -4,8 +4,8 @@ import numpy as np
 import tensorflow as tf
 import tflearn
 
-from rlcore.core import rl_utils
-from rlcore.algos.grad.grad_algo import RLGradientAlgorithm
+from markov.core import rl_utils
+from markov.algos.grad.grad_algo import RLGradientAlgorithm
 
 class DQN(RLGradientAlgorithm):
     """
@@ -38,7 +38,7 @@ class DQN(RLGradientAlgorithm):
 
         self.states = self.policy.input_tensor
         self.action_values = self.policy.model
-        
+
         # vanilla gradient = mul(sum(logprobs * rewards))
         self.L = -tf.reduce_sum(tf.mul(self.logprobs, self.rewards))
         self.grads_and_vars = self.opt.compute_gradients(self.L)

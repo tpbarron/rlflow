@@ -6,12 +6,12 @@ import argparse
 
 from iprims.promp import ProbabilisticMovementPrimitive
 
-from rlcore.logger.snapshotter import Snapshotter
-from rlcore.envs.normalized_env import normalize
-from rlcore.envs.baxter.baxter_utils import BaxterUtils
-from rlcore.envs.baxter.baxter_reacher_env import BaxterReacherEnv
-from rlcore.policies.f_approx.movement_primitive import MovementPrimitivesApproximator
-from rlcore.algos.prob.promp_itr import ProMPIteration
+from markov.logger.snapshotter import Snapshotter
+from markov.envs.normalized_env import normalize
+from markov.envs.baxter.baxter_utils import BaxterUtils
+from markov.envs.baxter.baxter_reacher_env import BaxterReacherEnv
+from markov.policies.f_approx.movement_primitive import MovementPrimitivesApproximator
+from markov.algos.prob.promp_itr import ProMPIteration
 
 
 def run_test_episode(env, approx, episode_len=np.inf):

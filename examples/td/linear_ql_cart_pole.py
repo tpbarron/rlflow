@@ -4,10 +4,10 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from rlcore.policies.f_approx import LinearApproximator
-from rlcore.algos.grad.ql_approx import QLearning
-from rlcore.algos.grad.sarsa_approx import SARSA
-from rlcore.core import rl_utils
+from markov.policies.f_approx import LinearApproximator
+from markov.algos.grad.ql_approx import QLearning
+from markov.algos.grad.sarsa_approx import SARSA
+from markov.core import rl_utils
 
 
 if __name__ == "__main__":

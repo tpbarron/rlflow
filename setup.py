@@ -18,23 +18,23 @@ test_requirements = [
 ]
 
 setup(
-    name='rlcore',
+    name='markov',
     version='0.1.0',
     description="A framework for learning about and experimenting with reinforcement learning algorithms",
     long_description=readme + '\n\n' + history,
     author="Trevor Barron",
     author_email='barron.trevor@gmail.com',
-    url='https://github.com/tpbarron/rlcore',
+    url='https://github.com/tpbarron/markov',
     packages=[
-        'rlcore',
+        'markov',
     ],
-    package_dir={'rlcore':
-                 'rlcore'},
+    package_dir={'markov':
+                 'markov'},
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='rlcore',
+    keywords='markov',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

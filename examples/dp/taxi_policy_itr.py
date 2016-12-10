@@ -2,9 +2,9 @@ from __future__ import print_function
 
 import numpy as np
 import gym
-from rlcore.policies.tab import TabularPolicy
-from rlcore.algos.dp import PolicyIteration
-from rlcore.core import rl_utils
+from markov.policies.tab import TabularPolicy
+from markov.algos.dp import PolicyIteration
+from markov.core import rl_utils
 
 if __name__ == "__main__":
     """

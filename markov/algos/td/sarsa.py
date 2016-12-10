@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import absolute_import
 
 import numpy as np
-from rlcore.algos.td.td_algo import RLTDAlgorithm
+from markov.algos.td.td_algo import RLTDAlgorithm
 
 class SARSA(RLTDAlgorithm):
 

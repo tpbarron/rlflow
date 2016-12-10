@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.layers.convolutional import Convolution2D
 from keras.layers.core import Dense, Flatten, Reshape
 
-from rlcore.memories.experience_replay import ExperienceReplay
+from markov.memories.experience_replay import ExperienceReplay
 
 class DQN(object):
 

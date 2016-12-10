@@ -6,8 +6,8 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
-from rlcore.core import rl_utils
-from rlcore.core.input_stream_processor import InputStreamProcessor
+from markov.core import rl_utils
+from markov.core.input_stream_processor import InputStreamProcessor
 
 
 class RLAlgorithm(object):
@@ -107,9 +107,9 @@ class RLAlgorithm(object):
     def train(self,
               max_iterations=10000,
               gym_record=False,
-              gym_record_dir='/tmp/rlcore/gym/',
+              gym_record_dir='/tmp/markov/gym/',
               tensorboard_log=False,
-              tensorboard_log_dir='/tmp/rlcore/tensorboard/'):
+              tensorboard_log_dir='/tmp/markov/tensorboard/'):
         """
         This method is an abstraction to the training process.
 

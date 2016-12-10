@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import numpy as np
 import copy
-from rlcore.policies.tab import TabularPolicy
+from markov.policies.tab import TabularPolicy
 
 
 class ValueIteration(object):

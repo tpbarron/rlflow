@@ -4,8 +4,8 @@ import numpy as np
 import tensorflow as tf
 import tflearn
 
-from rlcore.core import rl_utils
-from rlcore.algos.grad.grad_algo import RLGradientAlgorithm
+from markov.core import rl_utils
+from markov.algos.grad.grad_algo import RLGradientAlgorithm
 
 class PolicyGradient(RLGradientAlgorithm):
     """
@@ -62,7 +62,7 @@ class PolicyGradient(RLGradientAlgorithm):
 
 
     def optimize(self):
-        ep_states, ep_raw_actions, ep_processed_actions, ep_rewards = self.run_episode() 
+        ep_states, ep_raw_actions, ep_processed_actions, ep_rewards = self.run_episode()
 
         if self.discount != 1.0:
             ep_rewards = rl_utils.discount_rewards(np.array(ep_rewards), gamma=self.discount)

@@ -3,18 +3,18 @@ RL Core Algorithms
 ===============================
 
 
-.. image:: https://img.shields.io/pypi/v/rlcore.svg
-        :target: https://pypi.python.org/pypi/rlcore
+.. image:: https://img.shields.io/pypi/v/markov.svg
+        :target: https://pypi.python.org/pypi/markov
 
-.. image:: https://img.shields.io/travis/tpbarron/rlcore.svg
-        :target: https://travis-ci.org/tpbarron/rlcore
+.. image:: https://img.shields.io/travis/tpbarron/markov.svg
+        :target: https://travis-ci.org/tpbarron/markov
 
-.. image:: https://readthedocs.org/projects/rlcore/badge/?version=latest
-        :target: https://rlcore.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/markov/badge/?version=latest
+        :target: https://markov.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/tpbarron/rlcore/shield.svg
-     :target: https://pyup.io/repos/github/tpbarron/rlcore/
+.. image:: https://pyup.io/repos/github/tpbarron/markov/shield.svg
+     :target: https://pyup.io/repos/github/tpbarron/markov/
      :alt: Updates
 
 
@@ -22,7 +22,7 @@ A framework for learning about and experimenting with reinforcement learning alg
 
 
 * Free software: MIT license
-* Documentation: https://rlcore.readthedocs.io.
+* Documentation: https://markov.readthedocs.io.
 
 
 Features

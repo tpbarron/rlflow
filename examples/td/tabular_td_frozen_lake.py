@@ -2,9 +2,9 @@ from __future__ import print_function
 
 import numpy as np
 from gym.envs.toy_text.frozen_lake import FrozenLakeEnv
-from rlcore.policies.tab import TabularPolicy
-from rlcore.algos.td.tdlmda import TDLambda
-from rlcore.core import rl_utils
+from markov.policies.tab import TabularPolicy
+from markov.algos.td.tdlmda import TDLambda
+from markov.core import rl_utils
 
 if __name__ == "__main__":
     env = FrozenLakeEnv(is_slippery=True)

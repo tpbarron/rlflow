@@ -1,8 +1,8 @@
 from __future__ import print_function
 
 import argparse
-from rlcore.logger.snapshotter import Snapshotter
-from rlcore.viz.plotter import Plotter
+from markov.logger.snapshotter import Snapshotter
+from markov.viz.plotter import Plotter
 from os import listdir
 from os.path import isfile, join
 

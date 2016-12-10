@@ -8,9 +8,9 @@ from iprims.promp import ProbabilisticMovementPrimitive
 
 from gym_baxter.envs.baxter_avoider_env import BaxterAvoiderEnv
 from gym_baxter.envs import baxter_utils as bu
-from rlcore.policies.f_approx.movement_primitive import MovementPrimitivesApproximator
-from rlcore.algos.grad.finite_diff import FiniteDifference
-from rlcore.logger.snapshotter import Snapshotter
+from markov.policies.f_approx.movement_primitive import MovementPrimitivesApproximator
+from markov.algos.grad.finite_diff import FiniteDifference
+from markov.logger.snapshotter import Snapshotter
 
 
 def run_test_episode(env, approx, episode_len=np.inf):

@@ -1,8 +1,8 @@
 from __future__ import print_function
 import numpy as np
 
-from rlcore.algos.grad.grad_algo import RLGradientAlgorithm
-from rlcore.core import rl_utils
+from markov.algos.grad.grad_algo import RLGradientAlgorithm
+from markov.core import rl_utils
 
 class FiniteDifference(RLGradientAlgorithm):
 

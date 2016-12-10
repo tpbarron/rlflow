@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from rlcore.policies.policy import Policy
+from markov.policies.policy import Policy
 
 class FunctionApproximator(Policy):
 

@@ -4,10 +4,10 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from rlcore.core import rl_utils
-from rlcore.core import tf_utils
-from rlcore.policies.f_approx import Network
-from rlcore.algos.grad import PolicyGradient
+from markov.core import rl_utils
+from markov.core import tf_utils
+from markov.policies.f_approx import Network
+from markov.algos.grad import PolicyGradient
 
 if __name__ == "__main__":
     env = gym.make("CartPole-v0")

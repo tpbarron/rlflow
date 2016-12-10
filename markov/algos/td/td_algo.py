@@ -1,5 +1,5 @@
 
-from rlcore.algos.algo import RLAlgorithm
+from markov.algos.algo import RLAlgorithm
 
 class RLTDAlgorithm(RLAlgorithm):
 

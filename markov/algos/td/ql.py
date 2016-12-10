@@ -1,8 +1,8 @@
 from __future__ import print_function
 import numpy as np
 
-from rlcore.algos.td.td_algo import RLTDAlgorithm
-from rlcore.core import rl_utils
+from markov.algos.td.td_algo import RLTDAlgorithm
+from markov.core import rl_utils
 
 class QLearning(RLTDAlgorithm):
 

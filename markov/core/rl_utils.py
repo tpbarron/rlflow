@@ -1,5 +1,5 @@
 import numpy as np
-from rlcore.policies.policy import Policy
+from markov.policies.policy import Policy
 
 
 #
