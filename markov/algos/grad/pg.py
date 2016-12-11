@@ -55,21 +55,21 @@ class PolicyGradient(RLGradientAlgorithm):
         else:
             self.update = self.opt.apply_gradients(self.grads_and_vars)
 
-        # TODO: if baseline is set learn a critic
+        # TODO: if baseline is set, learn a critic
         self.baseline = baseline
 
         self.sess.run(tf.global_variables_initializer())
 
 
     def optimize(self):
-        ep_states, ep_raw_actions, ep_processed_actions, ep_rewards = self.run_episode()
+        ep_states, ep_actions, ep_rewards, _ = self.run_episode()
 
         if self.discount != 1.0:
             ep_rewards = rl_utils.discount_rewards(np.array(ep_rewards), gamma=self.discount)
 
-        formatted_actions = np.zeros((len(ep_raw_actions), self.env.action_space.n))
-        for i in range(len(ep_processed_actions)):
-            formatted_actions[i][ep_processed_actions[i]] = 1.0
+        formatted_actions = np.zeros((len(ep_actions), self.env.action_space.n))
+        for i in range(len(ep_actions)):
+            formatted_actions[i][ep_actions[i]] = 1.0
 
         formatted_rewards = ep_rewards
         if self.standardize:

@@ -13,6 +13,14 @@ class InputStreamProcessor(object):
         pass
 
 
+    def reset(self):
+        """
+        This method is called at the start of every episode, use to reset state
+        if necessary
+        """
+        return
+
+
     def process_observation(self, obs):
         """
         Take in the current observation, do any necessary processing and return

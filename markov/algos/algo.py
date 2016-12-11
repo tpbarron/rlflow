@@ -53,55 +53,79 @@ class RLAlgorithm(object):
         return action
 
 
+
+    def reset(self):
+        """
+        Reset the environment to the start state. Can override this method
+        to do custom reset processing.
+        """
+        self.input_stream_processor.reset()
+        return self.env.reset()
+
+
+    def act(self, obs):
+        """
+        Take in the current observation and return the action to take.
+        Override for custom action selection, eg. epsilon greedy, gradient
+        updates during trajectories (DQN), etc.
+        """
+        obs = self.input_stream_processor.process_observation(obs)
+        obs = self.apply_prediction_preprocessors(obs)
+        action = self.policy.predict(obs)
+        action = self.apply_prediction_postprocessors(action)
+        return action
+
+
+    def step_callback(self, state, action, reward, done, info):
+        """
+        Callback method that subclasses can implement to receive info about
+        last step
+        """
+        return
+
+
     def run_episode(self, render=True, verbose=False):
         """
         Runs environment to completion and returns reward under given policy
         Returns the sequence of rewards, states, raw actions (direct from the policy),
             and processed actions (actions sent to the env)
-
-        TODO: Make this method more modular so can abstract a `step` method
-        that subclasses can override to make more custom
         """
         ep_rewards = []
         ep_states = []
-        ep_raw_actions = []
-        ep_processed_actions = []
+        ep_actions = []
+        ep_infos = []
 
         done = False
-        obs = self.env.reset()
+        obs = self.reset()
 
         episode_itr = 0
         while not done and episode_itr < self.episode_len:
             if render:
                 self.env.render()
 
-            obs = self.input_stream_processor.process_observation(obs)
-            obs = self.apply_prediction_preprocessors(obs)
+            action = self.act(obs)
 
-            # store observation used to predict
+            # store observation used to predict and raw action
             ep_states.append(obs)
+            ep_actions.append(action)
 
-            action = self.policy.predict(obs)
+            next_obs, reward, done, info = self.env.step(action)
 
-            # store raw action
-            ep_raw_actions.append(action)
+            # call the callback method for subclasses
+            self.step_callback(obs, action, reward, done, info)
 
-            action = self.apply_prediction_postprocessors(action)
-
-            # store action sent to environment
-            ep_processed_actions.append(action)
-
-            obs, reward, done, _ = self.env.step(action)
-
-            # store reward from environment
+            # store reward from environment and any meta data returned
             ep_rewards.append(reward)
+            ep_infos.append(info)
+
+            obs = next_obs
 
             episode_itr += 1
 
         if verbose:
             print ('Game finished, reward: %f' % (sum(ep_rewards)))
 
-        return ep_states, ep_raw_actions, ep_processed_actions, ep_rewards
+        return ep_states, ep_actions, ep_rewards, ep_infos
 
 
     def train(self,
@@ -128,7 +152,6 @@ class RLAlgorithm(object):
             self.optimize()
 
             if i % 10 == 0:
-                # print (i)
                 # TODO: log rewards to tensorboard
                 reward = rl_utils.run_test_episode(self.env,
                                                    self.policy,
