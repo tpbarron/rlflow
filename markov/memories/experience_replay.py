@@ -5,8 +5,8 @@ class ExperienceReplay(object):
 
     SARS = collections.namedtuple('SARS', ['S1', 'A', 'R', 'S2'])
 
-    def __init__(self, size=1000000):
-        self.size = size
+    def __init__(self, max_size=1000000):
+        self.max_size = max_size
         self.memory = []
 
 
@@ -18,7 +18,7 @@ class ExperienceReplay(object):
         e is a list [s0, a, r, s1]
         """
         # check if at max size
-        if (len(self.memory) == self.size):
+        if (len(self.memory) == self.max_size):
             self.memory.pop(0)
 
         sars = ExperienceReplay.SARS(e[0], e[1], e[2], e[3])
@@ -34,3 +34,7 @@ class ExperienceReplay(object):
             sample_elements.append(self.memory[random.randint(0, len(self.memory)-1)])
 
         return sample_elements
+
+
+    def size(self):
+        return len(self.memory)

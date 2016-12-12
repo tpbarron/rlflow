@@ -1,8 +1,10 @@
 
 class Exploration(object):
 
-    def __init__(self):
-        pass
+    ADDITIVE_EXPLORATION, CONDITIONAL_EXPLORATION = range(2)
+
+    def __init__(self, exp_type):
+        self.exp_type = exp_type
 
 
     def explore(self, x):

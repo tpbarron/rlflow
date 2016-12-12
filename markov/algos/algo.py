@@ -7,7 +7,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 from markov.core import rl_utils
-from markov.core.input_stream_processor import InputStreamProcessor
+from markov.core.input.input_stream_processor import InputStreamProcessor
 
 
 class RLAlgorithm(object):
@@ -16,7 +16,14 @@ class RLAlgorithm(object):
     function that calls the subclass optimize method.
     """
 
-    def __init__(self, env, policy, session, episode_len, discount, standardize):
+    def __init__(self,
+                 env,
+                 policy,
+                 session,
+                 episode_len,
+                 discount,
+                 standardize,
+                 input_processor):
         """
         RLAlgorithm constructor
         """
@@ -26,8 +33,10 @@ class RLAlgorithm(object):
         self.episode_len = episode_len
         self.discount = discount
         self.standardize = standardize
-
-        self.input_stream_processor = InputStreamProcessor()
+        self.input_stream_processor = input_processor
+        if self.input_stream_processor is None:
+            # just create a default
+            self.input_stream_processor = InputStreamProcessor()
 
 
     def optimize(self):
@@ -53,7 +62,6 @@ class RLAlgorithm(object):
         return action
 
 
-
     def reset(self):
         """
         Reset the environment to the start state. Can override this method
@@ -70,9 +78,12 @@ class RLAlgorithm(object):
         updates during trajectories (DQN), etc.
         """
         obs = self.input_stream_processor.process_observation(obs)
-        obs = self.apply_prediction_preprocessors(obs)
+        if obs is None:
+            return self.env.action_space.sample()
+
+        # obs = self.apply_prediction_preprocessors(obs)
         action = self.policy.predict(obs)
-        action = self.apply_prediction_postprocessors(action)
+        # action = self.apply_prediction_postprocessors(action)
         return action
 
 
@@ -151,12 +162,12 @@ class RLAlgorithm(object):
         for i in range(max_iterations):
             self.optimize()
 
-            if i % 10 == 0:
-                # TODO: log rewards to tensorboard
-                reward = rl_utils.run_test_episode(self.env,
-                                                   self.policy,
-                                                   episode_len=self.episode_len)
-                print ("Reward: " + str(reward) + ", on iteration " + str(i))
+            # if i % 10 == 0:
+            #     # TODO: log rewards to tensorboard
+            #     reward = rl_utils.run_test_episode(self.env,
+            #                                        self.policy,
+            #                                        episode_len=self.episode_len)
+            #     print ("Reward: " + str(reward) + ", on iteration " + str(i))
 
         if gym_record:
             self.env.monitor.close()

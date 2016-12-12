@@ -11,6 +11,7 @@ class RLGradientAlgorithm(RLAlgorithm):
                  episode_len,
                  discount,
                  standardize,
+                 input_processor,
                  optimizer,
                  learning_rate,
                  clip_gradients):
@@ -20,7 +21,8 @@ class RLGradientAlgorithm(RLAlgorithm):
                                                   session,
                                                   episode_len,
                                                   discount,
-                                                  standardize)
+                                                  standardize,
+                                                  input_processor)
 
         self.learning_rate = learning_rate
         self.tfl_opt = tflearn.optimizers.get(optimizer)(learning_rate)
