@@ -27,14 +27,14 @@ if __name__ == "__main__":
         net = tflearn.flatten(net)
         net = tflearn.fully_connected(net, 1024, activation='relu')
         net = tflearn.fully_connected(net, env.action_space.n, activation='linear')
-        net = output_processors.max_q_value(net)
 
         for var in tf.trainable_variables():
             print (var.name)
 
         network = Network(input_tensor,
                           net,
-                          sess)
+                          sess,
+                          Network.TYPE_DQN)
 
         memory = ExperienceReplay(max_size=10000)
         egreedy = EpsilonGreedy(0.9, 0.1, 1000)
@@ -51,7 +51,8 @@ if __name__ == "__main__":
                   input_processor=input_processor,
                   episode_len=100,
                   discount=0.9,
-                  optimizer='adam')
+                  optimizer='adam',
+                  memory_init_size=100)
 
         dqn.train(max_iterations=1000, gym_record=False)
 

@@ -3,7 +3,7 @@ import random
 
 class ExperienceReplay(object):
 
-    SARS = collections.namedtuple('SARS', ['S1', 'A', 'R', 'S2'])
+    SARS = collections.namedtuple('SARS', ['S1', 'A', 'R', 'S2', 'T'])
 
     def __init__(self, max_size=1000000):
         self.max_size = max_size
@@ -15,13 +15,13 @@ class ExperienceReplay(object):
         Add an element to the back of the memory
         Removes an element from the front if full
 
-        e is a list [s0, a, r, s1]
+        e is a list [s0, a, r, s1, terminal]
         """
         # check if at max size
         if (len(self.memory) == self.max_size):
             self.memory.pop(0)
 
-        sars = ExperienceReplay.SARS(e[0], e[1], e[2], e[3])
+        sars = ExperienceReplay.SARS(e[0], e[1], e[2], e[3], e[4])
         self.memory.append(sars)
 
 

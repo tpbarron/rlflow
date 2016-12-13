@@ -8,10 +8,13 @@ from .f_approximator import FunctionApproximator
 
 class Network(FunctionApproximator):
 
-    def __init__(self, input_tensor, model, session, **kwargs):
-        super(Network, self).__init__(input_tensor, model, session, **kwargs)
+    def __init__(self, input_tensor, model, session, pol_type):
+        super(Network, self).__init__(input_tensor,
+                                      model,
+                                      session,
+                                      pol_type)
 
 
     def predict(self, x):
         x = x[np.newaxis,:]
-        return self.sess.run(self.model, feed_dict={self.input_tensor: x})
+        return self.sess.run(self.prediction_model, feed_dict={self.input_tensor: x})

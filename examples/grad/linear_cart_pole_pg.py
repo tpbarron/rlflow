@@ -12,7 +12,6 @@ if __name__ == "__main__":
     env = gym.make("CartPole-v0")
 
     with tf.Session() as sess:
-
         in_dimen = env.observation_space.shape[0]
         out_dimen = env.action_space.n
 
@@ -23,7 +22,8 @@ if __name__ == "__main__":
         lin_approx = LinearApproximator(input_tensor,
                                         linear,
                                         sess,
-                                        prediction_postprocessors=[rl_utils.sample, rl_utils.cast_int])
+                                        LinearApproximator.TYPE_PG)
+                 
         pg = PolicyGradient(env,
                             lin_approx,
                             sess,

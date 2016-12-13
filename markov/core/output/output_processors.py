@@ -8,11 +8,27 @@ import numpy as np
 # Q learning DQN style
 def max_q_value(x, d=1):
     """
-    TODO: this could return the index of the max, which would correspond to the
-    action to be taken. But then the loss function is not valid.
+    Return the index of the max, which would correspond to the
+    action to be taken.
     """
-    vals, indices = tf.nn.top_k(x)
-    return indices
+    x = cast_int(tf.squeeze(tf.argmax(x, axis=d)))
+    return x
+
+
+def cast_int(x):
+    """
+    Cast the output of x to an int64
+    """
+    return tf.to_int64(x)
+
+
+def sample(x):
+    return tf.multinomial(tf.log(x), 1)
+
+
+def pg_sample(x):
+    x = cast_int(tf.squeeze(sample(x)))
+    return x
 
 
 def sign(x):
@@ -32,11 +48,11 @@ def sign(x):
         return 1
 
 
-def cast_int(x):
-    """
-    Cast the output of x to an int64
-    """
-    return tf.to_int64(x)
+# def cast_int(x):
+#     """
+#     Cast the output of x to an int64
+#     """
+#     return tf.to_int64(x)
 
 
 def prob(x):
@@ -44,12 +60,12 @@ def prob(x):
     return 0 if np.random.uniform() < x else 1
 
 
-def sample(x):
-    assert isinstance(x, np.ndarray)
-    x = np.squeeze(x)
-    assert x.ndim == 1
-    # renormalize to avoid 'does not sum to 1 errors'
-    return np.random.choice(len(x), 1, p=x/x.sum())
+# def sample(x):
+#     assert isinstance(x, np.ndarray)
+#     x = np.squeeze(x)
+#     assert x.ndim == 1
+#     # renormalize to avoid 'does not sum to 1 errors'
+#     return np.random.choice(len(x), 1, p=x/x.sum())
 
 #
 # def sample_outputs(x):

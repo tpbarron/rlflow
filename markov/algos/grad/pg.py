@@ -19,6 +19,7 @@ class PolicyGradient(RLGradientAlgorithm):
                  episode_len=np.inf,
                  discount=1.0,
                  standardize=True,
+                 input_processor=None,
                  learning_rate=0.01,
                  optimizer='sgd',
                  clip_gradients=(None, None),
@@ -30,6 +31,7 @@ class PolicyGradient(RLGradientAlgorithm):
                                              episode_len,
                                              discount,
                                              standardize,
+                                             input_processor,
                                              optimizer,
                                              learning_rate,
                                              clip_gradients)

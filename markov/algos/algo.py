@@ -77,7 +77,6 @@ class RLAlgorithm(object):
         Override for custom action selection, eg. epsilon greedy, gradient
         updates during trajectories (DQN), etc.
         """
-        obs = self.input_stream_processor.process_observation(obs)
         if obs is None:
             return self.env.action_space.sample()
 
@@ -92,6 +91,7 @@ class RLAlgorithm(object):
         Callback method that subclasses can implement to receive info about
         last step
         """
+        print (state, action, reward, done, info)
         return
 
 
@@ -114,6 +114,7 @@ class RLAlgorithm(object):
             if render:
                 self.env.render()
 
+            obs = self.input_stream_processor.process_observation(obs)
             action = self.act(obs)
 
             # store observation used to predict and raw action
@@ -161,7 +162,6 @@ class RLAlgorithm(object):
 
         for i in range(max_iterations):
             self.optimize()
-
             # if i % 10 == 0:
             #     # TODO: log rewards to tensorboard
             #     reward = rl_utils.run_test_episode(self.env,
