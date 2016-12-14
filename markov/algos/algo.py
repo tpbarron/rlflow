@@ -39,29 +39,6 @@ class RLAlgorithm(object):
             self.input_stream_processor = InputStreamProcessor()
 
 
-    def optimize(self):
-        """
-        Optimize method that subclasses implement
-        """
-        raise NotImplementedError
-
-
-    def apply_prediction_preprocessors(self, obs):
-        # print (policy.prediction_preprocessors)
-        if self.policy.prediction_preprocessors is not None:
-            for preprocessor in self.policy.prediction_preprocessors:
-                obs = preprocessor(obs)
-        return obs
-
-
-    def apply_prediction_postprocessors(self, action):
-        # print (policy.prediction_postprocessors)
-        if self.policy.prediction_postprocessors is not None:
-            for postprocessor in self.policy.prediction_postprocessors:
-                action = postprocessor(action)
-        return action
-
-
     def reset(self):
         """
         Reset the environment to the start state. Can override this method
@@ -80,13 +57,11 @@ class RLAlgorithm(object):
         if obs is None:
             return self.env.action_space.sample()
 
-        # obs = self.apply_prediction_preprocessors(obs)
         action = self.policy.predict(obs)
-        # action = self.apply_prediction_postprocessors(action)
         return action
 
 
-    def step_callback(self, state, action, reward, done, info):
+    def on_step_completion(self, state, action, reward, done, info):
         """
         Callback method that subclasses can implement to receive info about
         last step
@@ -124,7 +99,7 @@ class RLAlgorithm(object):
             next_obs, reward, done, info = self.env.step(action)
 
             # call the callback method for subclasses
-            self.step_callback(obs, action, reward, done, info)
+            self.on_step_completion(obs, action, reward, done, info)
 
             # store reward from environment and any meta data returned
             ep_rewards.append(reward)
@@ -138,6 +113,13 @@ class RLAlgorithm(object):
             print ('Game finished, reward: %f' % (sum(ep_rewards)))
 
         return ep_states, ep_actions, ep_rewards, ep_infos
+
+
+    def optimize(self):
+        """
+        Optimize method that subclasses implement
+        """
+        raise NotImplementedError
 
 
     def train(self,
@@ -171,3 +153,27 @@ class RLAlgorithm(object):
 
         if gym_record:
             self.env.monitor.close()
+
+
+    def checkpoint(self):
+        """
+        Can save the model itself by using tensorflow saver
+
+        But would also like to save any other relevent data, memories,
+        other parameters, etc.
+        """
+        pass
+
+
+    def restore(self, ckpt_file):
+        """
+        Restore state from a file
+        """
+        pass
+
+
+    def summarize(self):
+        """
+        
+        """
+        pass

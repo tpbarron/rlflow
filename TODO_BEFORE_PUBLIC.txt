@@ -1,8 +1,7 @@
 TODO:
-1) Add exploration strategy to algirhtms
-2) move rollout code into base algo.py class so can add to memory and such
-3) If rollout code in base then can also have InputStreamProcessor in base
-  and add transitions
+1) tensorboard logging
+2) model save / restore
+
 
 To Fix:
 * Unify policy iter / value iter with optimize()/ train() organization
@@ -12,8 +11,6 @@ To Fix:
 Misc:
 * logging functionality for tensorboard
 * parallel env rollouts for batch policies
-* need to be able to define an input / ouput preprocessor
-    so that one can easily define how the env observation get's handled over time
 
 Add linear methods:
 * RBF

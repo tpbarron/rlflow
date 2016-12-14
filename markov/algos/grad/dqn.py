@@ -80,7 +80,7 @@ class DQN(RLGradientAlgorithm):
             return super(DQN, self).act(obs)
 
 
-    def step_callback(self, obs, action, reward, done, info):
+    def on_step_completion(self, obs, action, reward, done, info):
         """
         Receive data from the last step, add to memory
         """
