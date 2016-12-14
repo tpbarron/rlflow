@@ -15,8 +15,6 @@ from markov.core.input.input_stream_downsampler_processor import InputStreamDown
 from markov.core.input.input_stream_sequential_processor import InputStreamSequentialProcessor
 from markov.core.input.input_stream_processor import InputStreamProcessor
 
-from markov.core.output import output_processors
-
 if __name__ == "__main__":
     env = gym.make("Pong-v0")
 
@@ -31,7 +29,8 @@ if __name__ == "__main__":
         network = Network(input_tensor,
                           net,
                           sess,
-                          Network.TYPE_DQN)
+                          Network.TYPE_DQN,
+                          use_clone_net=False)
 
         memory = ExperienceReplay(max_size=1000000)
         egreedy = EpsilonGreedy(0.9, 0.1, 1000000)
