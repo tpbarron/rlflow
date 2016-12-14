@@ -84,8 +84,6 @@ class DQN(RLGradientAlgorithm):
         """
         Receive data from the last step, add to memory
         """
-        if (obs is not None):
-            print ("obs: ", obs.shape)
         # mark that we have done another step for epsilon decrease
         self.exploration.increment_iteration()
 

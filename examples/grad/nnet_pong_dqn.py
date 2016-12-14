@@ -28,16 +28,13 @@ if __name__ == "__main__":
         net = tflearn.fully_connected(net, 1024, activation='relu')
         net = tflearn.fully_connected(net, env.action_space.n, activation='linear')
 
-        for var in tf.trainable_variables():
-            print (var.name)
-
         network = Network(input_tensor,
                           net,
                           sess,
                           Network.TYPE_DQN)
 
-        memory = ExperienceReplay(max_size=10000)
-        egreedy = EpsilonGreedy(0.9, 0.1, 1000)
+        memory = ExperienceReplay(max_size=1000000)
+        egreedy = EpsilonGreedy(0.9, 0.1, 1000000)
 
         downsampler = InputStreamDownsamplerProcessor((84, 84), gray=True)
         sequential = InputStreamSequentialProcessor(frames=4)
@@ -52,12 +49,13 @@ if __name__ == "__main__":
                   episode_len=100,
                   discount=0.9,
                   optimizer='adam',
-                  memory_init_size=100)
+                  memory_init_size=1000,
+                  clip_gradients=(-10,10))
 
-        dqn.train(max_iterations=1000, gym_record=False)
+        dqn.train(max_iterations=100000000, gym_record=False)
 
-        average_reward = rl_utils.average_test_episodes(env,
-                                                        network,
-                                                        10,
-                                                        episode_len=dqn.episode_len)
+        # average_reward = rl_utils.average_test_episodes(env,
+        #                                                 network,
+        #                                                 10,
+        #                                                 episode_len=dqn.episode_len)
         print ("Average: ", average_reward)
