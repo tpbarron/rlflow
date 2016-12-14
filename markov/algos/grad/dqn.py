@@ -25,29 +25,35 @@ class DQN(RLGradientAlgorithm):
                  optimizer='sgd',
                  clip_gradients=(None, None),
                  sample_size=32,
-                 memory_init_size=5000):
+                 memory_init_size=5000,
+                 clone_iterations=500):
 
         super(DQN, self).__init__(env,
-                                 policy,
-                                 session,
-                                 episode_len,
-                                 discount,
-                                 standardize,
-                                 input_processor,
-                                 optimizer,
-                                 learning_rate,
-                                 clip_gradients)
+                                  policy,
+                                  session,
+                                  episode_len,
+                                  discount,
+                                  standardize,
+                                  input_processor,
+                                  optimizer,
+                                  learning_rate,
+                                  clip_gradients)
 
         self.memory = memory
         self.exploration = exploration
         self.sample_size = sample_size
         self.memory_init_size = memory_init_size
+        self.clone_iterations = clone_iterations
+        self.steps = 0
 
         # vars to hold state updates
         self.last_state = None
 
         self.states = self.policy.input_tensor
         self.q_values = self.policy.model
+
+        self.target_states = self.policy.clone_input_tensor
+        self.target_q_values = self.policy.clone_model
 
         self.actions = tf.placeholder(tf.int64, shape=[None])
         self.a_one_hot = tf.one_hot(self.actions, self.env.action_space.n, 1.0, 0.0)
@@ -56,11 +62,10 @@ class DQN(RLGradientAlgorithm):
 
         self.L = tflearn.mean_square(self.y, self.q_value)
         self.grads_and_vars = self.opt.compute_gradients(self.L)
-        print (self.grads_and_vars)
 
         if None not in self.clip_gradients:
             self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
-                                            for gv in self.grads_and_vars]
+                                           for gv in self.grads_and_vars]
             self.update = self.opt.apply_gradients(self.clipped_grads_and_vars)
         else:
             self.update = self.opt.apply_gradients(self.grads_and_vars)
@@ -80,42 +85,55 @@ class DQN(RLGradientAlgorithm):
             return super(DQN, self).act(obs)
 
 
-    def on_step_completion(self, obs, action, reward, done, info):
+    def on_step_completion(self, obs, action, reward, done, info, mode):
         """
         Receive data from the last step, add to memory
         """
-        # mark that we have done another step for epsilon decrease
-        self.exploration.increment_iteration()
+        if mode == DQN.TRAIN:
+            self.steps += 1
 
-        # last state is none if this is the start of an episode
-        # obs is None until the input processor provides valid processing
-        if self.last_state is not None and obs is not None:
-            # then this is not the first state seen
-            self.memory.add_element([self.last_state, action, reward, obs, done])
+            # if at desired step, clone model
+            if self.steps % self.clone_iterations == 0:
+                self.policy.clone()
 
-        # else this is the first state in the episode, either way
-        # keep track of last state, if this is the end of an episode mark it
-        self.last_state = obs if not done else None
+            # mark that we have done another step for epsilon decrease
+            self.exploration.increment_iteration()
 
-        if self.memory.size() > self.memory_init_size:
-            samples = self.memory.sample(self.sample_size)
-            states, actions, rewards, next_states, terminals = [], [], [], [], []
-            for s in samples:
-                states.append(s.S1)
-                actions.append(s.A)
-                rewards.append(s.R)
-                next_states.append(s.S2)
-                terminals.append(s.T)
+            # last state is none if this is the start of an episode
+            # obs is None until the input processor provides valid processing
+            if self.last_state is not None and obs is not None:
+                # then this is not the first state seen
+                self.memory.add_element([self.last_state, action, reward, obs, done])
 
-            terminals = np.array(terminals) + 0
-            next_states = np.stack(next_states)
-            target_qs = self.sess.run(self.q_values, feed_dict={self.states: next_states})
-            ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
+            # else this is the first state in the episode, either way
+            # keep track of last state, if this is the end of an episode mark it
+            self.last_state = obs if not done else None
 
-            self.sess.run(self.update,
-                feed_dict={self.states: states,
-                           self.actions: actions,
-                           self.y: ys})
+            if self.memory.size() > self.memory_init_size:
+                samples = self.memory.sample(self.sample_size)
+                states, actions, rewards, next_states, terminals = [], [], [], [], []
+                for s in samples:
+                    states.append(s.S1)
+                    actions.append(s.A)
+                    rewards.append(s.R)
+                    next_states.append(s.S2)
+                    terminals.append(s.T)
+
+                terminals = np.array(terminals) + 0
+                next_states = np.stack(next_states)
+
+                with self.policy.clone_graph.as_default():
+                    temp_sess = tf.Session()
+                    temp_sess.run(tf.global_variables_initializer())
+                    target_qs = temp_sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
+                    temp_sess.close()
+
+                ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
+
+                self.sess.run(self.update,
+                              feed_dict={self.states: states,
+                                         self.actions: actions,
+                                         self.y: ys})
 
 
     def optimize(self):

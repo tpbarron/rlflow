@@ -16,7 +16,7 @@ from markov.core.input.input_stream_sequential_processor import InputStreamSeque
 from markov.core.input.input_stream_processor import InputStreamProcessor
 
 if __name__ == "__main__":
-    env = gym.make("Pong-v0")
+    env = gym.make("Breakout-v0")
 
     with tf.Session() as sess:
         input_tensor = tflearn.input_data(shape=(None, 84, 84, 4)) #tf_utils.get_input_tensor_shape(env))
@@ -30,7 +30,7 @@ if __name__ == "__main__":
                           net,
                           sess,
                           Network.TYPE_DQN,
-                          use_clone_net=False)
+                          use_clone_net=True)
 
         memory = ExperienceReplay(max_size=1000000)
         egreedy = EpsilonGreedy(0.9, 0.1, 1000000)
@@ -46,15 +46,14 @@ if __name__ == "__main__":
                   egreedy,
                   input_processor=input_processor,
                   episode_len=100,
-                  discount=0.9,
-                  optimizer='adam',
-                  memory_init_size=1000,
-                  clip_gradients=(-10,10))
+                  discount=0.99,
+                  learning_rate=0.00025,
+                  optimizer='rmsprop',
+                  memory_init_size=50000,
+                  clip_gradients=(-1.0, 1.0),
+                  clone_iterations=10000)
 
         dqn.train(max_iterations=100000000, gym_record=False)
 
-        # average_reward = rl_utils.average_test_episodes(env,
-        #                                                 network,
-        #                                                 10,
-        #                                                 episode_len=dqn.episode_len)
-        print ("Average: ", average_reward)
+        avg_reward = dqn.test(episodes=10)
+        print ("Avg test reward: ", avg_reward)

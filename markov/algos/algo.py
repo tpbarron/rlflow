@@ -16,6 +16,8 @@ class RLAlgorithm(object):
     function that calls the subclass optimize method.
     """
 
+    TRAIN, TEST = range(2)
+
     def __init__(self,
                  env,
                  policy,
@@ -64,13 +66,12 @@ class RLAlgorithm(object):
     def on_step_completion(self, state, action, reward, done, info):
         """
         Callback method that subclasses can implement to receive info about
-        last step
+        last step, this is called during training but not testing.
         """
-        print (state, action, reward, done, info)
         return
 
 
-    def run_episode(self, render=True, verbose=False):
+    def run_episode(self, render=True, verbose=False, mode=TRAIN):
         """
         Runs environment to completion and returns reward under given policy
         Returns the sequence of rewards, states, raw actions (direct from the policy),
@@ -99,7 +100,7 @@ class RLAlgorithm(object):
             next_obs, reward, done, info = self.env.step(action)
 
             # call the callback method for subclasses
-            self.on_step_completion(obs, action, reward, done, info)
+            self.on_step_completion(obs, action, reward, done, info, mode)
 
             # store reward from environment and any meta data returned
             ep_rewards.append(reward)
@@ -144,15 +145,27 @@ class RLAlgorithm(object):
 
         for i in range(max_iterations):
             self.optimize()
-            # if i % 10 == 0:
-            #     # TODO: log rewards to tensorboard
-            #     reward = rl_utils.run_test_episode(self.env,
-            #                                        self.policy,
-            #                                        episode_len=self.episode_len)
-            #     print ("Reward: " + str(reward) + ", on iteration " + str(i))
+            if i % 10 == 0:
+                _, _, ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+                reward = sum(ep_rewards)
+                print ("Reward: " + str(reward) + ", on iteration " + str(i))
 
         if gym_record:
             self.env.monitor.close()
+
+
+    def test(self,
+             episodes=10):
+        """
+        """
+        total_reward = 0.0
+        for i in range(episodes):
+            _, _, ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+            reward = sum(ep_rewards)
+            print ("Reward: " + str(reward) + ", on iteration " + str(i))
+            total_reward += reward
+
+        return float(total_reward) / episodes
 
 
     def checkpoint(self):
@@ -174,6 +187,6 @@ class RLAlgorithm(object):
 
     def summarize(self):
         """
-        
+
         """
         pass

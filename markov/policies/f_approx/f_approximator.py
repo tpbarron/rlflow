@@ -24,6 +24,7 @@ class FunctionApproximator(Policy):
             self.clone_graph = tf.Graph()
             self.clone_model = None
             self.clone_prediction_model = None
+            self.clone_input_tensor = None
 
             self.build_clone_model()
             self.clone() # copy initial state
@@ -57,6 +58,9 @@ class FunctionApproximator(Policy):
                                                                                  self.clone_graph,
                                                                                  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='clone'),
                                                                                  scope='clone')
+            self.clone_input_tensor = tf.contrib.copy_graph.get_copied_op(self.input_tensor,
+                                                                          self.clone_graph,
+                                                                          scope='clone')
 
 
     def clone(self):
@@ -67,7 +71,7 @@ class FunctionApproximator(Policy):
             for var1, var2 in zip(tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='clone'), tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)):
                 temp_sess.run(var1.assign(var2))
             temp_sess.close()
-            
+
 
     def update(self, gradient):
         raise NotImplementedError
