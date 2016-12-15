@@ -26,7 +26,7 @@ class DQN(RLGradientAlgorithm):
                  clip_gradients=(None, None),
                  sample_size=32,
                  memory_init_size=5000,
-                 clone_iterations=500):
+                 clone_frequency=10000):
 
         super(DQN, self).__init__(env,
                                   policy,
@@ -43,7 +43,7 @@ class DQN(RLGradientAlgorithm):
         self.exploration = exploration
         self.sample_size = sample_size
         self.memory_init_size = memory_init_size
-        self.clone_iterations = clone_iterations
+        self.clone_frequency = clone_frequency
         self.steps = 0
 
         # vars to hold state updates
@@ -60,7 +60,7 @@ class DQN(RLGradientAlgorithm):
         self.q_value = tf.reduce_sum(tf.mul(self.q_values, self.a_one_hot))
         self.y = tf.placeholder(tf.float32, shape=[None])
 
-        self.L = tflearn.mean_square(self.y, self.q_value)
+        self.L = tflearn.mean_square(self.q_value, self.y)
         self.grads_and_vars = self.opt.compute_gradients(self.L)
 
         if None not in self.clip_gradients:
@@ -71,6 +71,7 @@ class DQN(RLGradientAlgorithm):
             self.update = self.opt.apply_gradients(self.grads_and_vars)
 
         self.sess.run(tf.global_variables_initializer())
+        self.sess.graph.finalize()
 
 
     def act(self, obs):
@@ -78,6 +79,9 @@ class DQN(RLGradientAlgorithm):
         Overriding act so can do proper exploration processing,
         add to memory and sample from memory for updates
         """
+        if self.memory.size() < self.memory_init_size:
+            return self.env.action_space.sample()
+
         if self.exploration.explore():
             return self.env.action_space.sample()
         else:
@@ -90,15 +94,6 @@ class DQN(RLGradientAlgorithm):
         Receive data from the last step, add to memory
         """
         if mode == DQN.TRAIN:
-            self.steps += 1
-
-            # if at desired step, clone model
-            if self.steps % self.clone_iterations == 0:
-                self.policy.clone()
-
-            # mark that we have done another step for epsilon decrease
-            self.exploration.increment_iteration()
-
             # last state is none if this is the start of an episode
             # obs is None until the input processor provides valid processing
             if self.last_state is not None and obs is not None:
@@ -109,7 +104,10 @@ class DQN(RLGradientAlgorithm):
             # keep track of last state, if this is the end of an episode mark it
             self.last_state = obs if not done else None
 
-            if self.memory.size() > self.memory_init_size:
+            if self.memory.size() >= self.memory_init_size:
+                # mark that we have done another step for epsilon decrease
+                self.exploration.increment_iteration()
+
                 samples = self.memory.sample(self.sample_size)
                 states, actions, rewards, next_states, terminals = [], [], [], [], []
                 for s in samples:
@@ -123,10 +121,7 @@ class DQN(RLGradientAlgorithm):
                 next_states = np.stack(next_states)
 
                 with self.policy.clone_graph.as_default():
-                    temp_sess = tf.Session()
-                    temp_sess.run(tf.global_variables_initializer())
-                    target_qs = temp_sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
-                    temp_sess.close()
+                    target_qs = self.policy.clone_sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
 
                 ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
 
@@ -134,6 +129,10 @@ class DQN(RLGradientAlgorithm):
                               feed_dict={self.states: states,
                                          self.actions: actions,
                                          self.y: ys})
+
+                # if at desired step, clone model
+                if self.steps % self.clone_frequency == 0:
+                    self.policy.clone()
 
 
     def optimize(self):

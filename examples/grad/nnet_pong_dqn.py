@@ -11,9 +11,7 @@ from markov.algos.grad.dqn import DQN
 from markov.memories.experience_replay import ExperienceReplay
 from markov.exploration.egreedy import EpsilonGreedy
 
-from markov.core.input.input_stream_downsampler_processor import InputStreamDownsamplerProcessor
-from markov.core.input.input_stream_sequential_processor import InputStreamSequentialProcessor
-from markov.core.input.input_stream_processor import InputStreamProcessor
+from markov.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
 
 if __name__ == "__main__":
     env = gym.make("Breakout-v0")
@@ -33,10 +31,10 @@ if __name__ == "__main__":
                           use_clone_net=True)
 
         memory = ExperienceReplay(max_size=1000000)
-        egreedy = EpsilonGreedy(0.9, 0.1, 1000000)
+        egreedy = EpsilonGreedy(0.9, 0.1, 100000)
 
         downsampler = InputStreamDownsamplerProcessor((84, 84), gray=True)
-        sequential = InputStreamSequentialProcessor(frames=4)
+        sequential = InputStreamSequentialProcessor(observations=4)
         input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
         dqn = DQN(env,
@@ -45,15 +43,14 @@ if __name__ == "__main__":
                   memory,
                   egreedy,
                   input_processor=input_processor,
-                  episode_len=100,
                   discount=0.99,
-                  learning_rate=0.00025,
-                  optimizer='rmsprop',
-                  memory_init_size=50000,
-                  clip_gradients=(-1.0, 1.0),
-                  clone_iterations=10000)
+                  learning_rate=0.001,
+                  optimizer='adagrad',
+                  memory_init_size=5000,
+                  clip_gradients=(-10.0, 10.0),
+                  clone_frequency=10000)
 
-        dqn.train(max_iterations=100000000, gym_record=False)
+        dqn.train(max_iterations=100000000)
 
         avg_reward = dqn.test(episodes=10)
         print ("Avg test reward: ", avg_reward)

@@ -8,9 +8,9 @@ from markov.policies.tab import TabularValue
 from markov.policies.tab import TabularPolicy
 from markov.core import rl_utils
 
-class TDLambda(RLTDAlgorithm):
+class TD(RLTDAlgorithm):
     """
-    TD Lambda implementation from Sutton's Intro to RL
+    TD implementation
     """
 
     def __init__(self,

@@ -145,7 +145,7 @@ class RLAlgorithm(object):
 
         for i in range(max_iterations):
             self.optimize()
-            if i % 10 == 0:
+            if i % 100 == 0:
                 _, _, ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
                 reward = sum(ep_rewards)
                 print ("Reward: " + str(reward) + ", on iteration " + str(i))

@@ -5,8 +5,8 @@ from .input_stream_processor import InputStreamProcessor
 
 class InputStreamSequentialProcessor(InputStreamProcessor):
 
-    def __init__(self, frames=4):
-        self.frames = frames
+    def __init__(self, observations=4):
+        self.observations = observations
         self.current_sequence = []
 
 
@@ -27,11 +27,11 @@ class InputStreamSequentialProcessor(InputStreamProcessor):
         random action will be taken.
         """
         self.current_sequence.append(obs)
-        if len(self.current_sequence) < self.frames:
+        if len(self.current_sequence) < self.observations:
             return None
 
-        if len(self.current_sequence) > self.frames:
-            self.current_sequence.pop()
+        if len(self.current_sequence) > self.observations:
+            self.current_sequence.pop(0)
 
         # convert current sequence to input
         # stacking essentially adds a single axis, want it to be after
