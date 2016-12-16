@@ -5,8 +5,8 @@ class EpsilonGreedy(Exploration):
 
     def __init__(self,
                  initial_epsilon,
-                 decay_to_value,
-                 decay_to_iteration):
+                 decay_to_value=None,
+                 decay_to_iteration=None):
         """
         Epsilon between [0, 1]
         """
@@ -14,7 +14,6 @@ class EpsilonGreedy(Exploration):
         self.initial_epsilon = initial_epsilon
         self.decay_to_value = decay_to_value
         self.decay_to_iteration = decay_to_iteration
-
         self.current_iteration = 0
 
 
@@ -26,12 +25,12 @@ class EpsilonGreedy(Exploration):
         """
         Returns true if should explore, else False
         """
-        if self.current_iteration < self.decay_to_iteration:
-            epsilon = 1.0 - self.initial_epsilon * (float(self.current_iteration) / self.decay_to_iteration)
+        if self.decay_to_value is None or self.decay_to_iteration is None:
+            epsilon = self.initial_epsilon
         else:
-            epsilon = self.decay_to_value
+            if self.current_iteration < self.decay_to_iteration:
+                epsilon = 1.0 - self.initial_epsilon * (float(self.current_iteration) / self.decay_to_iteration)
+            else:
+                epsilon = self.decay_to_value
 
-        if random.random() < epsilon:
-            return True
-
-        return False
+        return random.random() < epsilon

@@ -4,11 +4,11 @@ import numpy as np
 import tensorflow as tf
 import tflearn
 
-from markov.algos.grad.grad_algo import RLGradientAlgorithm
+from .td_algo import RLTDAlgorithm
 
-class DQN(RLGradientAlgorithm):
+class DQN(RLTDAlgorithm):
     """
-    Basic deep q network implementation based on tensorflow network
+    Basic deep q network implementation based on TFLearn network
     """
 
     def __init__(self,

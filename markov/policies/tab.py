@@ -9,6 +9,8 @@ from .policy import Policy
 
 """
 Defines tabular policies, all epsilon greedy
+
+These only apply to the DP methods
 """
 
 class Tabular(Policy):

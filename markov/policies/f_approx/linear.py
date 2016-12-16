@@ -10,9 +10,5 @@ class LinearApproximator(FunctionApproximator):
                                                  pol_type)
 
 
-    def get_num_weights(self):
-        return tf.size(self.W).eval()
-
-
     def predict(self, x):
         return self.sess.run(self.prediction_model, feed_dict={self.input_tensor: x.reshape(1, len(x))})

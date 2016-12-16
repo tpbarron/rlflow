@@ -5,8 +5,8 @@ import tensorflow as tf
 import tflearn
 
 from markov.policies.f_approx import Network
-from markov.algos.grad.dqn import DQN
-from markov.memories.experience_replay import ExperienceReplay
+from markov.algos.td import DQN
+from markov.memories import ExperienceReplay
 from markov.exploration.egreedy import EpsilonGreedy
 
 from markov.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
@@ -14,10 +14,10 @@ from markov.core.input import InputStreamDownsamplerProcessor, InputStreamSequen
 saver = tf.train.Saver()
 
 if __name__ == "__main__":
-    env = gym.make("Pong-v0")
+    env = gym.make("Breakout-v0")
 
     with tf.Session() as sess:
-        input_tensor = tflearn.input_data(shape=(None, 84, 84, 4)) #tf_utils.get_input_tensor_shape(env))
+        input_tensor = tflearn.input_data(shape=(None, 84, 84, 4))
         net = tflearn.conv_2d(input_tensor, 16, 8, 4, activation='relu')
         net = tflearn.conv_2d(net, 32, 4, 2, activation='relu')
         net = tflearn.flatten(net)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                   clip_gradients=(-10.0, 10.0),
                   clone_frequency=10000)
 
-        dqn.restore('/tmp/rlflow/model.ckpt-0')
-        dqn.train(max_episodes=100, save_frequency=10)
+        dqn.train(max_episodes=100000000, save_frequency=10)
+
         rewards = dqn.test(episodes=10)
-        print ("Rewards on test: ", rewards)
+        print ("Avg test reward: ", float(sum(rewards)) / len(rewards))

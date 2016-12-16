@@ -4,9 +4,7 @@ import tflearn
 
 class RLGradientAlgorithm(RLAlgorithm):
     """
-    Parent class for any algorithm that uses gradient based optimization. This
-    includes methods like DQN since they are based on neural network approximators
-    even though traditionally DQN would classify as a temporal difference algorithm.
+    Parent class for any algorithm that uses gradient based optimization.
     """
 
     def __init__(self,

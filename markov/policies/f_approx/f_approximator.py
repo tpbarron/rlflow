@@ -7,7 +7,13 @@ from markov.core.output import output_processors
 
 class FunctionApproximator(Policy):
 
-    TYPE_PG, TYPE_DQN = range(2)
+    """
+    TYPE_PG: the output represents actions probabilities
+    TYPE_DQN: the output represents q-values for a certain number of discrete actions
+    TYPE_SA_V: the output represents an action value for taking action A in state S
+    """
+    TYPE_PG, TYPE_DQN, TYPE_SA_V = range(3)
+
 
     def __init__(self, model, session, pol_type, use_clone_net=False, **kwargs):
         super(FunctionApproximator, self).__init__(**kwargs)
@@ -78,10 +84,6 @@ class FunctionApproximator(Policy):
         # assign variables
         with self.clone_graph.as_default():
             [self.clone_sess.run(op) for op in self.clone_ops]
-
-
-    def update(self, gradient):
-        raise NotImplementedError
 
 
     def predict(self, obs):

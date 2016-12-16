@@ -6,4 +6,5 @@ from .f_approximator import FunctionApproximator
 
 class RadialBasisFunction(FunctionApproximator):
 
-    pass
+    def __init__(self):
+        raise NotImplementedError
