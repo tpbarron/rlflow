@@ -1,9 +1,6 @@
 =======
-Credits
+Authors
 =======
-
-Development Lead
-----------------
 
 * Trevor Barron <barron.trevor@gmail.com>
 

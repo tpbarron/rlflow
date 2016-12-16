@@ -7,7 +7,7 @@ from markov.core import rl_utils
 class QLearning(RLTDAlgorithm):
 
     def __init__(self, env, policy, step=0.1, discount=0.9, episode_len=np.inf):
-        super(QLearning, self).__init__(env, policy)
+        super(QLearning, self).__init__(env, policy, discount, episode_len)
         self.env = env
         self.policy = policy
         self.step = step
@@ -46,11 +46,3 @@ class QLearning(RLTDAlgorithm):
             state = next_state
 
             ep_steps += 1
-
-
-    def step(self):
-        pass
-
-
-    def reset(self):
-        pass

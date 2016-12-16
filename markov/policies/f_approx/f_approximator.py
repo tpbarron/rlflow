@@ -9,9 +9,9 @@ class FunctionApproximator(Policy):
 
     TYPE_PG, TYPE_DQN = range(2)
 
-    def __init__(self, input_tensor, model, session, pol_type, use_clone_net=False, **kwargs):
+    def __init__(self, model, session, pol_type, use_clone_net=False, **kwargs):
         super(FunctionApproximator, self).__init__(**kwargs)
-        self.input_tensor = input_tensor
+        self.input_tensor = tf.get_collection(tf.GraphKeys.INPUTS)[0]
         self.model = model
         self.sess = session
         self.pol_type = pol_type

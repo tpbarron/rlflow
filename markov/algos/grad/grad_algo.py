@@ -3,6 +3,11 @@ from markov.algos.algo import RLAlgorithm
 import tflearn
 
 class RLGradientAlgorithm(RLAlgorithm):
+    """
+    Parent class for any algorithm that uses gradient based optimization. This
+    includes methods like DQN since they are based on neural network approximators
+    even though traditionally DQN would classify as a temporal difference algorithm.
+    """
 
     def __init__(self,
                  env,
@@ -36,4 +41,4 @@ class RLGradientAlgorithm(RLAlgorithm):
         """
         Optimize method that subclasses implement
         """
-        raise NotImplementedError
+        return super(RLGradientAlgorithm, self).optimize()

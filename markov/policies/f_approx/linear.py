@@ -4,9 +4,8 @@ from .f_approximator import FunctionApproximator
 
 class LinearApproximator(FunctionApproximator):
 
-    def __init__(self, input_tensor, linear, session, pol_type):
-        super(LinearApproximator, self).__init__(input_tensor,
-                                                 linear,
+    def __init__(self, linear, session, pol_type):
+        super(LinearApproximator, self).__init__(linear,
                                                  session,
                                                  pol_type)
 

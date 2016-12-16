@@ -60,8 +60,8 @@ class DQN(RLGradientAlgorithm):
         self.q_value = tf.reduce_sum(tf.mul(self.q_values, self.a_one_hot))
         self.y = tf.placeholder(tf.float32, shape=[None])
 
-        self.L = tflearn.mean_square(self.q_value, self.y)
-        self.grads_and_vars = self.opt.compute_gradients(self.L)
+        self.L = tflearn.objectives.mean_square(self.q_value, self.y)
+        self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=tf.trainable_variables())
 
         if None not in self.clip_gradients:
             self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
@@ -137,6 +137,6 @@ class DQN(RLGradientAlgorithm):
 
     def optimize(self):
         """
-        In this case all the work happens in the callbacks
+        In this case all the work happens in the callbacks, just run an episode
         """
-        self.run_episode()
+        return super(DQN, self).optimize()

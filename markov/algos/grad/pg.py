@@ -80,3 +80,4 @@ class PolicyGradient(RLGradientAlgorithm):
         self.sess.run(self.update, feed_dict={self.actions: formatted_actions,
                                               self.states: ep_states,
                                               self.rewards: formatted_rewards})
+        return sum(ep_rewards)

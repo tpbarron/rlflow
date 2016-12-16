@@ -173,7 +173,6 @@ class TabularActionValue(Tabular):
         return self.get_max_action(state)
 
 
-
     def prettyprint(self):
         for i in range(self.edge):
             for j in range(self.edge):

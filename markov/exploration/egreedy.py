@@ -10,6 +10,7 @@ class EpsilonGreedy(Exploration):
         """
         Epsilon between [0, 1]
         """
+        super(EpsilonGreedy, self).__init__(Exploration.CONDITIONAL_EXPLORATION)
         self.initial_epsilon = initial_epsilon
         self.decay_to_value = decay_to_value
         self.decay_to_iteration = decay_to_iteration
@@ -19,12 +20,11 @@ class EpsilonGreedy(Exploration):
 
     def increment_iteration(self):
         self.current_iteration += 1
-        
+
 
     def explore(self):
         """
-        Returns true if should explore,
-        else False
+        Returns true if should explore, else False
         """
         if self.current_iteration < self.decay_to_iteration:
             epsilon = 1.0 - self.initial_epsilon * (float(self.current_iteration) / self.decay_to_iteration)

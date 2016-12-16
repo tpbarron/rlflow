@@ -19,20 +19,18 @@ if __name__ == "__main__":
 
         input_tensor = tflearn.input_data(shape=[None, in_dimen])
         linear = tflearn.fully_connected(input_tensor, out_dimen)
-        # tflearn.single_unit(input_tensor)
 
-        lin_approx = LinearApproximator(input_tensor,
-                                        linear,
+        lin_approx = LinearApproximator(linear,
                                         sess)
 
         ql = SARSA(env,
-                       lin_approx,
-                       sess,
-                       episode_len=100,
-                       discount=0.9,
-                       learning_rate=0.01,
-                       optimizer='adam',
-                       clip_gradients=(-1, 1))
+                   lin_approx,
+                   sess,
+                   episode_len=100,
+                   discount=0.9,
+                   learning_rate=0.01,
+                   optimizer='adam',
+                   clip_gradients=(-1, 1))
 
         ql.train(max_iterations=10000, gym_record=False)
 

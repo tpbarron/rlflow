@@ -4,7 +4,6 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from markov.core import rl_utils
 from markov.policies.f_approx import LinearApproximator
 from markov.algos.grad import PolicyGradient
 
@@ -19,11 +18,10 @@ if __name__ == "__main__":
         linear = tflearn.fully_connected(input_tensor, out_dimen, activation='linear')
         linear = tflearn.softmax(linear) # use softmax since we want probabilities for outputs
 
-        lin_approx = LinearApproximator(input_tensor,
-                                        linear,
+        lin_approx = LinearApproximator(linear,
                                         sess,
                                         LinearApproximator.TYPE_PG)
-                 
+
         pg = PolicyGradient(env,
                             lin_approx,
                             sess,
@@ -31,10 +29,8 @@ if __name__ == "__main__":
                             discount=0.9,
                             optimizer='adam')
 
-        pg.train(max_iterations=1000, gym_record=False)
+        pg.train(max_episodes=1000)
 
-        average_reward = rl_utils.average_test_episodes(env,
-                                                        lin_approx,
-                                                        10,
-                                                        episode_len=pg.episode_len)
+        rewards = pg.test(10)
+        average_reward = float(sum(rewards) / len(rewards))
         print ("Average: ", average_reward)

@@ -1,3 +1,8 @@
+"""
+This example works under python2.7 but not 3.5. I haven't had the time to find
+the cause yet.
+"""
+
 from __future__ import print_function
 
 import numpy as np

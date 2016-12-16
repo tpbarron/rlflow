@@ -8,9 +8,8 @@ from .f_approximator import FunctionApproximator
 
 class Network(FunctionApproximator):
 
-    def __init__(self, input_tensor, model, session, pol_type, use_clone_net=False):
-        super(Network, self).__init__(input_tensor,
-                                      model,
+    def __init__(self, model, session, pol_type, use_clone_net=False):
+        super(Network, self).__init__(model,
                                       session,
                                       pol_type,
                                       use_clone_net)

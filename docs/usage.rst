@@ -1,5 +1,5 @@
 =====
-Usage
+Getting Started
 =====
 
 To use RL Core Algorithms in a project::

@@ -1,11 +1,15 @@
+"""
+This example works under python2.7 but not 3.5. I haven't had the time to find
+the cause yet.
+"""
+
 from __future__ import print_function
 
-import numpy as np
 from gym.envs.toy_text.frozen_lake import FrozenLakeEnv
-from markov.policies.tab import TabularPolicy, TabularValue
+
+from markov.policies.tab import TabularPolicy
 from markov.algos.dp import PolicyIteration
 from markov.core import rl_utils
-
 
 if __name__ == "__main__":
 
