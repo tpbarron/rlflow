@@ -19,44 +19,45 @@ RLFlow
 
 
 A framework for learning about and experimenting with reinforcement learning algorithms.
-It aims to be as modular as possible so that new algorithms and ideas can easily be tested.
-I started it to gain a better understanding of core RL algorithms and maybe it
-can be useful for others as well.
+It is built on top of TensorFlow and `TFLearn <http://tflearn.org/>`_  and is interfaces
+with the OpenAI gym (universe should work, too). It aims to be as modular as possible so
+that new algorithms and ideas can easily be tested. I started it to gain a better
+understanding of core RL algorithms and maybe it can be useful for others as well.
 
 
 Features
 --------
 
-**RL Flow**
+Algorithms (future algorithms italicized):
 
-* Algorithms (future algorithms italicized)
+  - MDP algorithms
 
-    - MDP algorithms
+      + Value iteration
+      + Policy iteration
 
-        + Value iteration
-        + Policy iteration
+  - Temporal Difference Learning
 
-    - Temporal Difference Learning
+      + SARSA
+      + Deep Q-Learning
+      + *Policy gradient Q-learning*
 
-        + SARSA
-        + Deep Q-Learning
-        + *Policy gradient Q-learning*
+  - Gradient algorithms
 
-    - Gradient algorithms
+      + Vanilla policy gradient
+      + *Deterministic policy gradient*
+      + *Natural policy gradient*
 
-        + Vanilla policy gradient
-        + *Deterministic policy gradient*
-        + *Natural policy gradient*
+  - Gradient-Free algorithms
 
-    - Gradient-Free algorithms
+      + *Cross entropy method*
 
-        + *Cross entropy method*
+Function approximators (defined by TFLearn model):
 
-* Function approximators (defined by TFLearn model)
+  - Linear
+  - Neural network
+  - *RBF*
 
-    - Linear
-    - Neural network
-    - *RBF*
+Works with any OpenAI gym environment.
 
 
 Future Enhancements

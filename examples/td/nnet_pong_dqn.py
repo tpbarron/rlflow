@@ -4,7 +4,6 @@ import gym
 import tensorflow as tf
 import tflearn
 
-import markov
 from markov.policies.f_approx import Network
 from markov.algos.td import DQN
 from markov.memories import ExperienceReplay
@@ -22,7 +21,7 @@ if __name__ == "__main__":
         net = tflearn.fully_connected(net, 1024, activation='relu')
         net = tflearn.fully_connected(net, env.action_space.n, activation='linear')
 
-        network = markov.policies.f_approx.Network(net,
+        network = Network(net,
                           sess,
                           Network.TYPE_DQN,
                           use_clone_net=True)
