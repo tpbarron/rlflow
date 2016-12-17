@@ -5,7 +5,6 @@ language: python
 
 env:
   - TOXENV=py35
-  - TOXENV=py34
   - TOXENV=py27
 
 
@@ -31,5 +30,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: tpbarron/rlcore
+    repo: tpbarron/rlflow
     condition: $TOXENV == py27

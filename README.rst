@@ -1,59 +1,80 @@
 ===============================
-RL Core Algorithms
+RLFlow
 ===============================
 
 
-.. image:: https://img.shields.io/pypi/v/rlcore.svg
-        :target: https://pypi.python.org/pypi/rlcore
+.. image:: https://img.shields.io/pypi/v/rlflow.svg
+        :target: https://pypi.python.org/pypi/rlflow
 
-.. image:: https://img.shields.io/travis/tpbarron/rlcore.svg
-        :target: https://travis-ci.org/tpbarron/rlcore
+.. image:: https://img.shields.io/travis/tpbarron/rlflow.svg
+        :target: https://travis-ci.org/tpbarron/rlflow
 
-.. image:: https://readthedocs.org/projects/rlcore/badge/?version=latest
-        :target: https://rlcore.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/rlflow/badge/?version=latest
+        :target: https://rlflow.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/tpbarron/rlcore/shield.svg
-     :target: https://pyup.io/repos/github/tpbarron/rlcore/
+.. image:: https://pyup.io/repos/github/tpbarron/rlflow/shield.svg
+     :target: https://pyup.io/repos/github/tpbarron/rlflow/
      :alt: Updates
 
 
-A framework for learning about and experimenting with reinforcement learning algorithms
-
-
-* Free software: MIT license
-* Documentation: https://rlcore.readthedocs.io.
+A framework for learning about and experimenting with reinforcement learning algorithms.
+It is built on top of TensorFlow and `TFLearn <http://tflearn.org/>`_  and is interfaces
+with the OpenAI gym (universe should work, too). It aims to be as modular as possible so
+that new algorithms and ideas can easily be tested. I started it to gain a better
+understanding of core RL algorithms and maybe it can be useful for others as well.
 
 
 Features
 --------
 
-* RL Core algorithms
+Algorithms (future algorithms italicized):
 
-* Algorithms to implement
-    * MDP algorithms
-        * Value iteration
-        * Policy iteration
-        * Policy evaluation
-    * Temporal Difference Learning
-        * TD(lambda)
-        * Q-Learning
-    * Gradient algorithms
-        * REINFORCE
-        * Finite difference
-        * Cross Entropy method
+  - MDP algorithms
 
-* Function Approximators
-    * Linear
-    * Neural network
+      + Value iteration
+      + Policy iteration
 
-* Data logging
+  - Temporal Difference Learning
+
+      + SARSA
+      + Deep Q-Learning
+      + *Policy gradient Q-learning*
+
+  - Gradient algorithms
+
+      + Vanilla policy gradient
+      + *Deterministic policy gradient*
+      + *Natural policy gradient*
+
+  - Gradient-Free algorithms
+
+      + *Cross entropy method*
+
+Function approximators (defined by TFLearn model):
+
+  - Linear
+  - Neural network
+  - *RBF*
+
+Works with any OpenAI gym environment.
 
 
-Credits
----------
+Future Enhancements
+-------------------
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+* Improved TensorBoard logging
+* Improved model snapshotting to include exploration states, memories, etc.
+* Any suggestions?
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+Fixes
+------------------
+* Errors / warnings on TensorFlow session save
+
+
+License
+------------------
+
+* Free software: MIT license
+* Documentation: https://rlflow.readthedocs.io.
