@@ -55,7 +55,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'RL Core Algorithms'
+project = u'RLFlow'
 copyright = u"2016, Trevor Barron"
 
 # The version info for the project you're documenting, acts as replacement
@@ -258,7 +258,7 @@ texinfo_documents = [
      u'RLFlow Documentation',
      u'Trevor Barron',
      'rlflow',
-     'One line description of project.',
+     'A framework for learning about and experimenting with reinforcement learning algorithms.',
      'Miscellaneous'),
 ]
 

@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install RL Core Algorithms, run this command in your terminal:
+To install RLFlow, run this command in your terminal:
 
 .. code-block:: console
 
     $ pip install rlflow
 
-This is the preferred method to install RL Core Algorithms, as it will always install the most recent stable release.
+This is the preferred method to install RLFlow, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for RL Core Algorithms can be downloaded from the `Github repo`_.
+The sources for RLFlow can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 

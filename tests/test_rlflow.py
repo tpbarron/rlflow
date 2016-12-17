@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-test_rlcore
+test_rlflow
 ----------------------------------
 
-Tests for `rlcore` module.
+Tests for `rlflow` module.
 """
 
 import pytest
 
-class TestRlcore(object):
+class TestRlflow(object):
 
     @classmethod
     def setup_class(cls):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -29,22 +29,26 @@ test_requirements = [
 
 setup(
     name='rlflow',
-    version='0.1.0',
+    version='0.1.3',
     description="A framework for learning about and experimenting with reinforcement learning algorithms",
     long_description=readme + '\n\n' + history,
     author="Trevor Barron",
     author_email='barron.trevor@gmail.com',
     url='https://github.com/tpbarron/rlflow',
-    packages=[
-        'rlflow',
-    ],
-    package_dir={'rlflow':
-                 'rlflow'},
+    packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='mdp machine learning reinforcement neural network',
+    keywords=[
+        'FLFlow',
+        'TFLearn',
+        'TensorFlow',
+        'Deep Learning',
+        'Reinforcement Learning',
+        'Machine Learning',
+        'Neural Networks'
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',

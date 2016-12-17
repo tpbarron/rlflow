@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-RL Core Algorithms could always use more documentation, whether as part of the
-official RL Core Algorithms docs, in docstrings, or even on the web in blog posts,
+RLFlow could always use more documentation, whether as part of the
+official RLFlow docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
