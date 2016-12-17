@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import absolute_import
 
 import numpy as np
-from markov.policies.tab import TabularValue
+from rlflow.policies.tab import TabularValue
 
 
 class PolicyIteration(object):

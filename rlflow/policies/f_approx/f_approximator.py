@@ -1,8 +1,8 @@
 from __future__ import print_function
 
 import tensorflow as tf
-from markov.policies.policy import Policy
-from markov.core.output import output_processors
+from rlflow.policies.policy import Policy
+from rlflow.core.output import output_processors
 
 
 class FunctionApproximator(Policy):

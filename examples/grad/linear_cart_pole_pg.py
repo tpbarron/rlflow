@@ -4,8 +4,8 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from markov.policies.f_approx import LinearApproximator
-from markov.algos.grad import PolicyGradient
+from rlflow.policies.f_approx import LinearApproximator
+from rlflow.algos.grad import PolicyGradient
 
 if __name__ == "__main__":
     env = gym.make("CartPole-v0")

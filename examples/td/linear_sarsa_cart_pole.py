@@ -4,9 +4,9 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from markov.policies.f_approx import LinearApproximator
-from markov.algos.td import SARSA
-from markov.exploration import EpsilonGreedy
+from rlflow.policies.f_approx import LinearApproximator
+from rlflow.algos.td import SARSA
+from rlflow.exploration import EpsilonGreedy
 
 
 if __name__ == "__main__":

@@ -4,11 +4,11 @@ import gym
 import tensorflow as tf
 import tflearn
 
-from markov.policies.f_approx import Network
-from markov.algos.td import DQN
-from markov.memories import ExperienceReplay
-from markov.exploration import EpsilonGreedy
-from markov.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
+from rlflow.policies.f_approx import Network
+from rlflow.algos.td import DQN
+from rlflow.memories import ExperienceReplay
+from rlflow.exploration import EpsilonGreedy
+from rlflow.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
 
 
 if __name__ == "__main__":

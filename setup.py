@@ -28,18 +28,18 @@ test_requirements = [
 ]
 
 setup(
-    name='markov',
+    name='rlflow',
     version='0.1.0',
     description="A framework for learning about and experimenting with reinforcement learning algorithms",
     long_description=readme + '\n\n' + history,
     author="Trevor Barron",
     author_email='barron.trevor@gmail.com',
-    url='https://github.com/tpbarron/markov',
+    url='https://github.com/tpbarron/rlflow',
     packages=[
-        'markov',
+        'rlflow',
     ],
-    package_dir={'markov':
-                 'markov'},
+    package_dir={'rlflow':
+                 'rlflow'},
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",

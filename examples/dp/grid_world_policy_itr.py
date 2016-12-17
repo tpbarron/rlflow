@@ -7,9 +7,9 @@ from __future__ import print_function
 
 from gym.envs.toy_text.frozen_lake import FrozenLakeEnv
 
-from markov.policies.tab import TabularPolicy
-from markov.algos.dp import PolicyIteration
-from markov.core import rl_utils
+from rlflow.policies.tab import TabularPolicy
+from rlflow.algos.dp import PolicyIteration
+from rlflow.core import rl_utils
 
 if __name__ == "__main__":
 

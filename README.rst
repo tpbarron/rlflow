@@ -3,18 +3,18 @@ RLFlow
 ===============================
 
 
-.. image:: https://img.shields.io/pypi/v/markov.svg
-        :target: https://pypi.python.org/pypi/markov
+.. image:: https://img.shields.io/pypi/v/rlflow.svg
+        :target: https://pypi.python.org/pypi/rlflow
 
-.. image:: https://img.shields.io/travis/tpbarron/markov.svg
-        :target: https://travis-ci.org/tpbarron/markov
+.. image:: https://img.shields.io/travis/tpbarron/rlflow.svg
+        :target: https://travis-ci.org/tpbarron/rlflow
 
-.. image:: https://readthedocs.org/projects/markov/badge/?version=latest
-        :target: https://markov.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/rlflow/badge/?version=latest
+        :target: https://rlflow.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/tpbarron/markov/shield.svg
-     :target: https://pyup.io/repos/github/tpbarron/markov/
+.. image:: https://pyup.io/repos/github/tpbarron/rlflow/shield.svg
+     :target: https://pyup.io/repos/github/tpbarron/rlflow/
      :alt: Updates
 
 
@@ -68,9 +68,13 @@ Future Enhancements
 * Any suggestions?
 
 
+Fixes
+------------------
+* Errors / warnings on TensorFlow session save
+
 
 License
 ------------------
 
 * Free software: MIT license
-* Documentation: https://markov.readthedocs.io.
+* Documentation: https://rlflow.readthedocs.io.

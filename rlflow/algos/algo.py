@@ -7,8 +7,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import tflearn
-from markov.core import rl_utils
-from markov.core.input.input_stream_processor import InputStreamProcessor
+from rlflow.core.input.input_stream_processor import InputStreamProcessor
 
 
 # Fix for TF 0.12
@@ -153,9 +152,9 @@ class RLAlgorithm(object):
               max_episodes=10000,
               save_frequency=100,
               gym_record=False,
-              gym_record_dir='/tmp/markov/gym/',
+              gym_record_dir='/tmp/rlflow/gym/',
               tensorboard_log=False,
-              tensorboard_log_dir='/tmp/markov/tensorboard/'):
+              tensorboard_log_dir='/tmp/rlflow/tensorboard/'):
         """
         This method is an abstraction to the training process.
 

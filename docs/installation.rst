@@ -12,7 +12,7 @@ To install RL Core Algorithms, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install markov
+    $ pip install rlflow
 
 This is the preferred method to install RL Core Algorithms, as it will always install the most recent stable release.
 
@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/tpbarron/markov
+    $ git clone git://github.com/tpbarron/rlflow
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/tpbarron/markov/tarball/master
+    $ curl  -OL https://github.com/tpbarron/rlflow/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/tpbarron/markov
-.. _tarball: https://github.com/tpbarron/markov/tarball/master
+.. _Github repo: https://github.com/tpbarron/rlflow
+.. _tarball: https://github.com/tpbarron/rlflow/tarball/master

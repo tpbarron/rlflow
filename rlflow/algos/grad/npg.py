@@ -3,8 +3,8 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from markov.core import rl_utils
-from markov.algos.grad.grad_algo import RLGradientAlgorithm
+from rlflow.core import rl_utils
+from rlflow.algos.grad.grad_algo import RLGradientAlgorithm
 
 
 class NaturalPG(RLGradientAlgorithm):

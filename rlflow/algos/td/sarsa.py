@@ -4,8 +4,8 @@ import numpy as np
 import tensorflow as tf
 import tflearn
 
-from markov.algos.td.td_algo import RLTDAlgorithm
-# from markov.core import rl_utils
+from rlflow.algos.td.td_algo import RLTDAlgorithm
+# from rlflow.core import rl_utils
 
 class SARSA(RLTDAlgorithm):
 

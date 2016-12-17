@@ -30,5 +30,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: tpbarron/markov
+    repo: tpbarron/rlflow
     condition: $TOXENV == py27

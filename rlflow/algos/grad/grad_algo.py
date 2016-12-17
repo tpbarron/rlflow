@@ -1,5 +1,5 @@
 
-from markov.algos.algo import RLAlgorithm
+from rlflow.algos.algo import RLAlgorithm
 import tflearn
 
 class RLGradientAlgorithm(RLAlgorithm):
