@@ -10,11 +10,21 @@ with open('docs/history.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    # TODO: put package requirements here
+    'gym',
+    'tflearn',
+    'numpy',
+    'Pillow'
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    'bumpversion',
+    'wheel',
+    'flake8',
+    'tox',
+    'coverage',
+    'Sphinx',
+    'pytest',
+    'path.py'
 ]
 
 setup(
@@ -34,10 +44,12 @@ setup(
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='markov',
+    keywords='mdp machine learning reinforcement neural network',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Education',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",

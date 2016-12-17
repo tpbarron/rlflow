@@ -19,6 +19,8 @@ class NaturalPG(RLGradientAlgorithm):
                  discount=False,
                  optimizer='sgd'):
 
+        raise NotImplementedError
+
         self.env = env
         self.policy = policy
         self.episode_len = episode_len

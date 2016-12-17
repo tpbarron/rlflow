@@ -86,9 +86,6 @@ class SARSA(RLTDAlgorithm):
 
             if self.last_state is not None and self.last_action is not None:
                 # use current step to do sarsa update
-                # TODO: this returns the max, is that what we want?
-                # Don't want max here for sarsa, want the value of the
-                # next state / action, that's what keeps it on policy
                 qspap = np.squeeze(self.sess.run(self.q_values, feed_dict={self.states: obs.reshape(1, 4)}))[action]
                 est = reward + self.discount * qspap
 

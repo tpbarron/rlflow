@@ -13,7 +13,7 @@ if __name__ == "__main__":
     env = gym.make('CartPole-v0')
 
     with tf.Session() as sess:
-        in_dimen = env.observation_space.shape[0] # + 1 #env.action_space.n
+        in_dimen = env.observation_space.shape[0]
         out_dimen = env.action_space.n
 
         input_tensor = tflearn.input_data(shape=[None, in_dimen])
@@ -23,7 +23,7 @@ if __name__ == "__main__":
                                         sess,
                                         LinearApproximator.TYPE_DQN)
 
-        egreedy = EpsilonGreedy(0.9)
+        egreedy = EpsilonGreedy(0.1)
 
         sarsa = SARSA(env,
                       lin_approx,

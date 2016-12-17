@@ -4,14 +4,12 @@ import gym
 import tensorflow as tf
 import tflearn
 
+import markov
 from markov.policies.f_approx import Network
 from markov.algos.td import DQN
 from markov.memories import ExperienceReplay
 from markov.exploration.egreedy import EpsilonGreedy
-
 from markov.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
-
-saver = tf.train.Saver()
 
 if __name__ == "__main__":
     env = gym.make("Breakout-v0")
@@ -24,7 +22,7 @@ if __name__ == "__main__":
         net = tflearn.fully_connected(net, 1024, activation='relu')
         net = tflearn.fully_connected(net, env.action_space.n, activation='linear')
 
-        network = Network(net,
+        network = markov.policies.f_approx.Network(net,
                           sess,
                           Network.TYPE_DQN,
                           use_clone_net=True)

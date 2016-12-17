@@ -1,5 +1,5 @@
 ===============================
-RL Core Algorithms
+RLFlow
 ===============================
 
 
@@ -18,46 +18,58 @@ RL Core Algorithms
      :alt: Updates
 
 
-A framework for learning about and experimenting with reinforcement learning algorithms
-
-
-* Free software: MIT license
-* Documentation: https://markov.readthedocs.io.
+A framework for learning about and experimenting with reinforcement learning algorithms.
+It aims to be as modular as possible so that new algorithms and ideas can easily be tested.
+I started it to gain a better understanding of core RL algorithms and maybe it
+can be useful for others as well.
 
 
 Features
 --------
 
-**RL Core algorithms**
+**RL Flow**
 
-* Algorithms to implement
+* Algorithms (future algorithms italicized)
 
-    * MDP algorithms
+    - MDP algorithms
 
-        * Value iteration
-        * Policy iteration
-        * Policy evaluation
+        + Value iteration
+        + Policy iteration
 
-    * Temporal Difference Learning
+    - Temporal Difference Learning
 
-        * TD(lambda)
-        * Q-Learning
+        + SARSA
+        + Deep Q-Learning
+        + *Policy gradient Q-learning*
 
-    * Gradient algorithms
+    - Gradient algorithms
 
-        * REINFORCE
-        * Finite difference
-        * Cross Entropy method
+        + Vanilla policy gradient
+        + *Deterministic policy gradient*
+        + *Natural policy gradient*
 
-* Function Approximators
+    - Gradient-Free algorithms
 
-    * Linear
-    * Neural network
+        + *Cross entropy method*
 
-Credits
----------
+* Function approximators (defined by TFLearn model)
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+    - Linear
+    - Neural network
+    - *RBF*
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+Future Enhancements
+-------------------
+
+* Improved TensorBoard logging
+* Improved model snapshotting to include exploration states, memories, etc.
+* Any suggestions?
+
+
+
+License
+------------------
+
+* Free software: MIT license
+* Documentation: https://markov.readthedocs.io.

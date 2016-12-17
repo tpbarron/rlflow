@@ -8,10 +8,8 @@ from markov.policies.f_approx import Network
 from markov.algos.td import DQN
 from markov.memories import ExperienceReplay
 from markov.exploration import EpsilonGreedy
-
 from markov.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
 
-saver = tf.train.Saver()
 
 if __name__ == "__main__":
     env = gym.make("Pong-v0")

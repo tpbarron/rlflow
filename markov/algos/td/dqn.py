@@ -94,6 +94,9 @@ class DQN(RLTDAlgorithm):
         Receive data from the last step, add to memory
         """
         if mode == DQN.TRAIN:
+            # clip reward between [-1, 1]
+            reward = reward if abs(reward) <= 1.0 else float(reward)/reward
+
             # last state is none if this is the start of an episode
             # obs is None until the input processor provides valid processing
             if self.last_state is not None and obs is not None:
