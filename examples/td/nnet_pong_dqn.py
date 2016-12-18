@@ -11,7 +11,7 @@ from rlflow.exploration.egreedy import EpsilonGreedy
 from rlflow.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
 
 if __name__ == "__main__":
-    env = gym.make("Breakout-v0")
+    env = gym.make("Pong-v0")
 
     with tf.Session() as sess:
         input_tensor = tflearn.input_data(shape=(None, 84, 84, 4))
@@ -33,6 +33,7 @@ if __name__ == "__main__":
         sequential = InputStreamSequentialProcessor(observations=4)
         input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
+        opt = tf.train.RMSPropOptimizer(0.001, momentum=0.95, epsilon=0.01)
         dqn = DQN(env,
                   network,
                   sess,
@@ -41,12 +42,12 @@ if __name__ == "__main__":
                   input_processor=input_processor,
                   discount=0.99,
                   learning_rate=0.001,
-                  optimizer='adagrad',
-                  memory_init_size=5000,
+                  optimizer=opt,
+                  memory_init_size=500,
                   clip_gradients=(-10.0, 10.0),
                   clone_frequency=10000)
 
-        dqn.train(max_episodes=100000000, save_frequency=10)
+        dqn.train(max_episodes=100000000, save_frequency=100)
 
         rewards = dqn.test(episodes=10)
         print ("Avg test reward: ", float(sum(rewards)) / len(rewards))

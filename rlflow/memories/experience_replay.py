@@ -18,7 +18,7 @@ class ExperienceReplay(object):
         e is a list [s0, a, r, s1, terminal]
         """
         # check if at max size
-        if (len(self.memory) == self.max_size):
+        if len(self.memory) > self.max_size:
             self.memory.pop(0)
 
         sars = ExperienceReplay.SARS(e[0], e[1], e[2], e[3], e[4])

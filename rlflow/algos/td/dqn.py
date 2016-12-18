@@ -22,7 +22,7 @@ class DQN(RLTDAlgorithm):
                  standardize=True,
                  input_processor=None,
                  learning_rate=0.01,
-                 optimizer='sgd',
+                 optimizer='rmsprop',
                  clip_gradients=(None, None),
                  sample_size=32,
                  memory_init_size=5000,

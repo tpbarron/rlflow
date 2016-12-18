@@ -1,4 +1,5 @@
 
+import tensorflow as tf
 import tflearn
 from ..algo import RLAlgorithm
 
@@ -26,9 +27,13 @@ class RLTDAlgorithm(RLAlgorithm):
                                             input_processor)
 
         self.learning_rate = learning_rate
-        self.tfl_opt = tflearn.optimizers.get(optimizer)(learning_rate)
-        self.tfl_opt.build()
-        self.opt = self.tfl_opt.get_tensor()
+
+        if isinstance(optimizer, tf.train.Optimizer):
+            self.opt = optimizer
+        else:
+            self.tfl_opt = tflearn.optimizers.get(optimizer)(learning_rate)
+            self.tfl_opt.build()
+            self.opt = self.tfl_opt.get_tensor()
 
         self.clip_gradients = clip_gradients
 
