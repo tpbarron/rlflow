@@ -33,7 +33,7 @@ if __name__ == "__main__":
         sequential = InputStreamSequentialProcessor(observations=4)
         input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
-        opt = tf.train.RMSPropOptimizer(0.001, momentum=0.95, epsilon=0.01)
+        opt = tflearn.optimizers.RMSProp(learning_rate=0.001, momentum=0.95, epsilon=0.01)
         dqn = DQN(env,
                   network,
                   sess,
