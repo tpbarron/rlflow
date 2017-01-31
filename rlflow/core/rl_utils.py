@@ -1,22 +1,17 @@
 import numpy as np
 import tensorflow as tf
+import scipy.signal
 
 #
 # Reward manipulation
 #
 
-def discount_rewards(rewards, gamma=0.9):
+def discount_rewards(x, gamma=0.9):
     """
     Take 1D float array of rewards and compute the sum of discounted rewards
     at each timestep
     """
-    discounted_r = np.zeros_like(rewards)
-    for i in range(rewards.size):
-        rew_sum = 0.0
-        for j in range(i, rewards.size):
-            rew_sum += rewards[j] * gamma ** j
-        discounted_r[i] = rew_sum
-    return discounted_r
+    return scipy.signal.lfilter([1], [1, -gamma], x[::-1], axis=0)[::-1]
 
 
 def standardize_rewards(rewards):

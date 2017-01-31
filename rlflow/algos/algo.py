@@ -9,7 +9,6 @@ import tensorflow as tf
 import tflearn
 from rlflow.core.input.input_stream_processor import InputStreamProcessor
 
-
 # Fix for TF 0.12
 try:
     writer_summary = tf.summary.FileWriter

@@ -123,11 +123,14 @@ class DQN(RLTDAlgorithm):
                 terminals = np.array(terminals) + 0
                 next_states = np.stack(next_states)
 
+                # his takes about 0.01 seconds on my laptop
                 with self.policy.clone_graph.as_default():
                     target_qs = self.policy.clone_sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
 
                 ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
 
+                # Is there a performance issue here? this takes about 0.07 seconds
+                # on my laptop
                 self.sess.run(self.update,
                               feed_dict={self.states: states,
                                          self.actions: actions,
