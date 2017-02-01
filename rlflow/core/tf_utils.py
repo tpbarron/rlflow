@@ -2,6 +2,26 @@ from __future__ import print_function
 
 import tensorflow as tf
 
+TF_SESSION = None
+
+def get_tf_session():
+    global TF_SESSION
+    if TF_SESSION is None:
+        TF_SESSION = tf.Session()
+    return TF_SESSION
+
+
+def set_tf_session(sess):
+    global TF_SESSION
+    TF_SESSION = sess
+
+
+def build_policy_copy_ops(policy1, policy2):
+    """
+    Build the ops to copy weights from policy1 to policy2
+    """
+    clone_ops = [var1.assign(var2) for var1, var2 in zip(policy1.get_params(), policy2.get_params())]
+    return clone_ops
 
 #
 # Mathematical convenience function
@@ -12,6 +32,17 @@ def stddev(x):
     return tf.sqrt(tf.reduce_mean(tf.square(tf.abs
         (tf.sub(x, tf.fill(x.get_shape(), tf.reduce_mean(x)))))))
 
+
+def mean_square(y_pred, y_true):
+    """ Mean Square Loss.
+    Arguments:
+        y_pred: `Tensor` of `float` type. Predicted values.
+        y_true: `Tensor` of `float` type. Targets (labels).
+
+    From: https://github.com/tflearn/tflearn/blob/master/tflearn/objectives.py
+    """
+    with tf.name_scope("MeanSquare"):
+        return tf.reduce_mean(tf.square(y_pred - y_true))
 
 
 #

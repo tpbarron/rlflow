@@ -5,9 +5,9 @@ import tensorflow as tf
 import tflearn
 
 from rlflow.core import rl_utils
-from rlflow.algos.grad.grad_algo import RLGradientAlgorithm
+from rlflow.algos.algo import RLAlgorithm
 
-class PolicyGradient(RLGradientAlgorithm):
+class PolicyGradient(RLAlgorithm):
     """
     Basic stochastic policy gradient implementation based on Keras network
     """

@@ -4,10 +4,10 @@ import numpy as np
 import tensorflow as tf
 
 from rlflow.core import rl_utils
-from rlflow.algos.grad.grad_algo import RLGradientAlgorithm
+from rlflow.algos.algo import RLAlgorithm
 
 
-class NaturalPG(RLGradientAlgorithm):
+class NaturalPG(RLAlgorithm):
     """
     Natural policy gradient implementation based on Keras network
     """

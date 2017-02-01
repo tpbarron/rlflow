@@ -7,19 +7,21 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import tflearn
+
+from rlflow.core import tf_utils
 from rlflow.core.input.input_stream_processor import InputStreamProcessor
 
-# Fix for TF 0.12
-try:
-    writer_summary = tf.summary.FileWriter
-    merge_all_summaries = tf.summary.merge_all
-    histogram_summary = tf.summary.histogram
-    scalar_summary = tf.summary.scalar
-except Exception:
-    writer_summary = tf.train.SummaryWriter
-    merge_all_summaries = tf.merge_all_summaries
-    histogram_summary = tf.histogram_summary
-    scalar_summary = tf.scalar_summary
+# # Fix for TF 0.12
+# try:
+#     writer_summary = tf.summary.FileWriter
+#     merge_all_summaries = tf.summary.merge_all
+#     histogram_summary = tf.summary.histogram
+#     scalar_summary = tf.summary.scalar
+# except Exception:
+#     writer_summary = tf.train.SummaryWriter
+#     merge_all_summaries = tf.merge_all_summaries
+#     histogram_summary = tf.histogram_summary
+#     scalar_summary = tf.scalar_summary
 
 
 class RLAlgorithm(object):
@@ -30,22 +32,24 @@ class RLAlgorithm(object):
 
     TRAIN, TEST = range(2)
 
-    SUMMARY_COLLECTION_NAME = "summary_collection"
+    # SUMMARY_COLLECTION_NAME = "summary_collection"
 
     def __init__(self,
                  env,
                  policy,
-                 session,
                  episode_len,
                  discount,
                  standardize,
-                 input_processor):
+                 input_processor,
+                 optimizer,
+                 learning_rate,
+                 clip_gradients):
         """
         RLAlgorithm constructor
         """
         self.env = env
         self.policy = policy
-        self.sess = session
+        self.sess = tf_utils.get_tf_session()
         self.episode_len = episode_len
         self.discount = discount
         self.standardize = standardize
@@ -54,11 +58,22 @@ class RLAlgorithm(object):
             # just create a default
             self.input_stream_processor = InputStreamProcessor()
 
+
         self.saver = tf.train.Saver()
-        self.summary_op = None
-        self.build_summary_ops()
-        self.summary_writer = tf.train.SummaryWriter('/tmp/rlflow/log',
-                                                     self.sess.graph)
+        # self.summary_op = None
+        # self.build_summary_ops()
+        # self.summary_writer = tf.train.SummaryWriter('/tmp/rlflow/log',
+        #                                              self.sess.graph)
+
+        self.learning_rate = learning_rate
+        self.opt = optimizer
+        # if isinstance(optimizer, tflearn.optimizers.Optimizer):
+        #     self.tfl_opt = optimizer
+        # else:
+        #     self.tfl_opt = tflearn.optimizers.get(optimizer)(learning_rate)
+        # self.tfl_opt.build()
+        # self.opt = self.tfl_opt.get_tensor()
+        self.clip_gradients = clip_gradients
 
 
     def reset(self):
@@ -147,6 +162,14 @@ class RLAlgorithm(object):
         return sum(ep_rewards)
 
 
+    def on_train_start(self):
+        """
+        Callback for subclasses to implement if they wish to do any processing right
+        before training commences.
+        """
+        return
+
+
     def train(self,
               max_episodes=10000,
               save_frequency=100,
@@ -159,6 +182,12 @@ class RLAlgorithm(object):
 
         It allows for recording the run to upload to OpenAI gym
         """
+
+        self.sess.run(tf.global_variables_initializer())
+        self.sess.graph.finalize()
+
+        self.on_train_start()
+
         if gym_record:
             self.env.monitor.start(gym_record_dir)
 
@@ -208,32 +237,32 @@ class RLAlgorithm(object):
         print("Session restored from file: %s" % ckpt_file)
 
 
-    def build_summary_ops(self, verbose=3):
-        """
-        Build summary ops for activations, gradients, reward, q values,
-        values estimates, etc
-        Create summaries with `verbose` level
-        """
-        if verbose >= 3:
-            # Summarize activations
-            activations = tf.get_collection(tf.GraphKeys.ACTIVATIONS)
-            tflearn.summarize_activations(activations, RLAlgorithm.SUMMARY_COLLECTION_NAME)
-        if verbose >= 2:
-            # Summarize variable weights
-            tflearn.summarize_variables(tf.trainable_variables(), RLAlgorithm.SUMMARY_COLLECTION_NAME)
-        if verbose >= 1:
-            # summarize reward
-            episode_reward = tf.Variable(0., trainable=False)
-            self.episode_reward_summary = scalar_summary("Reward", episode_reward, collections=RLAlgorithm.SUMMARY_COLLECTION_NAME)
-            self.episode_reward_placeholder = tf.placeholder("float")
-            self.episode_reward_op = episode_reward.assign(self.episode_reward_placeholder)
-            tf.add_to_collection(RLAlgorithm.SUMMARY_COLLECTION_NAME, self.episode_reward_summary)
-
-            # Summarize gradients
-            # tflearn.summarize_gradients(self.grads_and_vars, summ_collection)
-
-        if len(tf.get_collection(RLAlgorithm.SUMMARY_COLLECTION_NAME)) != 0:
-            self.summary_op = merge_all_summaries(key=RLAlgorithm.SUMMARY_COLLECTION_NAME)
+    # def build_summary_ops(self, verbose=3):
+    #     """
+    #     Build summary ops for activations, gradients, reward, q values,
+    #     values estimates, etc
+    #     Create summaries with `verbose` level
+    #     """
+    #     if verbose >= 3:
+    #         # Summarize activations
+    #         activations = tf.get_collection(tf.GraphKeys.ACTIVATIONS)
+    #         tflearn.summarize_activations(activations, RLAlgorithm.SUMMARY_COLLECTION_NAME)
+    #     if verbose >= 2:
+    #         # Summarize variable weights
+    #         tflearn.summarize_variables(tf.trainable_variables(), RLAlgorithm.SUMMARY_COLLECTION_NAME)
+    #     if verbose >= 1:
+    #         # summarize reward
+    #         episode_reward = tf.Variable(0., trainable=False)
+    #         self.episode_reward_summary = scalar_summary("Reward", episode_reward, collections=RLAlgorithm.SUMMARY_COLLECTION_NAME)
+    #         self.episode_reward_placeholder = tf.placeholder("float")
+    #         self.episode_reward_op = episode_reward.assign(self.episode_reward_placeholder)
+    #         tf.add_to_collection(RLAlgorithm.SUMMARY_COLLECTION_NAME, self.episode_reward_summary)
+    #
+    #         # Summarize gradients
+    #         # tflearn.summarize_gradients(self.grads_and_vars, summ_collection)
+    #
+    #     if len(tf.get_collection(RLAlgorithm.SUMMARY_COLLECTION_NAME)) != 0:
+    #         self.summary_op = merge_all_summaries(key=RLAlgorithm.SUMMARY_COLLECTION_NAME)
 
 
     def summarize(self, step, reward):

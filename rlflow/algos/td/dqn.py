@@ -2,11 +2,12 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
-import tflearn
+import tensorlayer as tl
 
-from .td_algo import RLTDAlgorithm
+from rlflow.algos.algo import RLAlgorithm
+from rlflow.core import tf_utils
 
-class DQN(RLTDAlgorithm):
+class DQN(RLAlgorithm):
     """
     Basic deep q network implementation based on TFLearn network
     """
@@ -14,7 +15,7 @@ class DQN(RLTDAlgorithm):
     def __init__(self,
                  env,
                  policy,
-                 session,
+                 clone_policy,
                  memory,
                  exploration,
                  episode_len=np.inf,
@@ -29,8 +30,7 @@ class DQN(RLTDAlgorithm):
                  clone_frequency=10000):
 
         super(DQN, self).__init__(env,
-                                  policy,
-                                  session,
+                                  clone_policy, # pass clone policy to super since that is the default for action selection
                                   episode_len,
                                   discount,
                                   standardize,
@@ -39,6 +39,10 @@ class DQN(RLTDAlgorithm):
                                   learning_rate,
                                   clip_gradients)
 
+
+        self.clone_ops = tf_utils.build_policy_copy_ops(policy, clone_policy)
+
+        self.train_policy = policy
         self.memory = memory
         self.exploration = exploration
         self.sample_size = sample_size
@@ -49,19 +53,19 @@ class DQN(RLTDAlgorithm):
         # vars to hold state updates
         self.last_state = None
 
-        self.states = self.policy.input_tensor
-        self.q_values = self.policy.model
+        self.states = self.train_policy.inputs[0]
+        self.q_values = self.train_policy.output
 
-        self.target_states = self.policy.clone_input_tensor
-        self.target_q_values = self.policy.clone_model
+        self.target_states = self.policy.inputs[0]
+        self.target_q_values = self.policy.output
 
         self.actions = tf.placeholder(tf.int64, shape=[None])
         self.a_one_hot = tf.one_hot(self.actions, self.env.action_space.n, 1.0, 0.0)
         self.q_value = tf.reduce_sum(tf.mul(self.q_values, self.a_one_hot))
         self.y = tf.placeholder(tf.float32, shape=[None])
 
-        self.L = tflearn.objectives.mean_square(self.q_value, self.y)
-        self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=tf.trainable_variables())
+        self.L = tf_utils.mean_square(self.q_value, self.y)
+        self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=self.train_policy.get_params())
 
         if None not in self.clip_gradients:
             self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
@@ -70,8 +74,19 @@ class DQN(RLTDAlgorithm):
         else:
             self.update = self.opt.apply_gradients(self.grads_and_vars)
 
-        self.sess.run(tf.global_variables_initializer())
-        self.sess.graph.finalize()
+
+    def clone(self):
+        """
+        Run the clone ops
+        """
+        self.sess.run([self.clone_ops])
+
+
+    def on_train_start(self):
+        """
+        Run the clone ops to make networks same at start
+        """
+        self.clone()
 
 
     def act(self, obs):
@@ -93,7 +108,7 @@ class DQN(RLTDAlgorithm):
         """
         Receive data from the last step, add to memory
         """
-        if mode == DQN.TRAIN:
+        if mode == RLAlgorithm.TRAIN:
             # clip reward between [-1, 1]
             reward = reward if abs(reward) <= 1.0 else float(reward)/reward
 
@@ -124,8 +139,8 @@ class DQN(RLTDAlgorithm):
                 next_states = np.stack(next_states)
 
                 # his takes about 0.01 seconds on my laptop
-                with self.policy.clone_graph.as_default():
-                    target_qs = self.policy.clone_sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
+                # with self.policy.clone_graph.as_default():
+                target_qs = self.sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
 
                 ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
 
@@ -138,7 +153,7 @@ class DQN(RLTDAlgorithm):
 
                 # if at desired step, clone model
                 if self.steps % self.clone_frequency == 0:
-                    self.policy.clone()
+                    self.clone()
 
 
     def optimize(self):
