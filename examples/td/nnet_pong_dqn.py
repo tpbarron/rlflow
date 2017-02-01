@@ -64,7 +64,7 @@ if __name__ == "__main__":
               discount=0.99,
               learning_rate=0.001,
               optimizer=opt,
-              memory_init_size=500,
+              memory_init_size=50000,
               clip_gradients=(-10.0, 10.0),
               clone_frequency=10000)
 

@@ -193,7 +193,8 @@ class RLAlgorithm(object):
 
         for i in range(max_episodes):
             ep_reward = self.optimize()
-            self.summarize(i, ep_reward)
+            print ("Episode reward: ", ep_reward)
+            # self.summarize(i, ep_reward)
 
             if i % save_frequency == 0:
                 self.checkpoint(step=i)
