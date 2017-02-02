@@ -42,7 +42,6 @@ class RLAlgorithm(object):
                  standardize,
                  input_processor,
                  optimizer,
-                 learning_rate,
                  clip_gradients):
         """
         RLAlgorithm constructor
@@ -65,14 +64,7 @@ class RLAlgorithm(object):
         # self.summary_writer = tf.train.SummaryWriter('/tmp/rlflow/log',
         #                                              self.sess.graph)
 
-        self.learning_rate = learning_rate
         self.opt = optimizer
-        # if isinstance(optimizer, tflearn.optimizers.Optimizer):
-        #     self.tfl_opt = optimizer
-        # else:
-        #     self.tfl_opt = tflearn.optimizers.get(optimizer)(learning_rate)
-        # self.tfl_opt.build()
-        # self.opt = self.tfl_opt.get_tensor()
         self.clip_gradients = clip_gradients
 
 
@@ -159,6 +151,7 @@ class RLAlgorithm(object):
         the total episode reward.
         """
         _, _, ep_rewards, _ = self.run_episode()
+        # print ("Rewards: ", ep_rewards)
         return sum(ep_rewards)
 
 

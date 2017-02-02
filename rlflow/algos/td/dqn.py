@@ -22,7 +22,6 @@ class DQN(RLAlgorithm):
                  discount=1.0,
                  standardize=True,
                  input_processor=None,
-                 learning_rate=0.01,
                  optimizer='rmsprop',
                  clip_gradients=(None, None),
                  sample_size=32,
@@ -36,7 +35,6 @@ class DQN(RLAlgorithm):
                                   standardize,
                                   input_processor,
                                   optimizer,
-                                  learning_rate,
                                   clip_gradients)
 
 
@@ -61,7 +59,11 @@ class DQN(RLAlgorithm):
 
         self.actions = tf.placeholder(tf.int64, shape=[None])
         self.a_one_hot = tf.one_hot(self.actions, self.env.action_space.n, 1.0, 0.0)
-        self.q_value = tf.reduce_sum(tf.mul(self.q_values, self.a_one_hot))
+
+        # This used to reduce the q-value to a single number!
+        # I don't think that is what I want. I want a list of q-values and a list of targets
+        # This should be bettwe with axis=1
+        self.q_value = tf.reduce_sum(tf.mul(self.q_values, self.a_one_hot), axis=1)
         self.y = tf.placeholder(tf.float32, shape=[None])
 
         self.L = tf_utils.mean_square(self.q_value, self.y)
@@ -146,6 +148,15 @@ class DQN(RLAlgorithm):
 
                 # Is there a performance issue here? this takes about 0.07 seconds
                 # on my laptop
+
+                # print (self.sess.run(self.q_value,
+                #               feed_dict={self.states: states,
+                #                          self.actions: actions}))
+                #
+                #
+                # import sys
+                # sys.exit()
+
                 self.sess.run(self.update,
                               feed_dict={self.states: states,
                                          self.actions: actions,

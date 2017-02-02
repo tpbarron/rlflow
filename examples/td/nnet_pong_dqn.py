@@ -37,13 +37,11 @@ if __name__ == "__main__":
     network = Network([input_tensor],
                       net,
                       Network.TYPE_DQN)
-    # net.print_layers()
 
     clone_input_tensor, clone_net = build_network('clone_net')
     clone_network = Network([clone_input_tensor],
                             clone_net,
                             Network.TYPE_DQN)
-    # clone_net.print_layers()
 
     memory = ExperienceReplay(max_size=1000000)
     egreedy = EpsilonGreedy(0.9, 0.1, 100000)
@@ -53,7 +51,6 @@ if __name__ == "__main__":
     input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
     opt = tf.train.RMSPropOptimizer(learning_rate=0.001, momentum=0.95, epsilon=0.01)
-    # opt = tflearn.optimizers.RMSProp(learning_rate=0.001, momentum=0.95, epsilon=0.01)
 
     dqn = DQN(env,
               network,
@@ -62,9 +59,8 @@ if __name__ == "__main__":
               egreedy,
               input_processor=input_processor,
               discount=0.99,
-              learning_rate=0.001,
               optimizer=opt,
-              memory_init_size=50000,
+              memory_init_size=500,
               clip_gradients=(-10.0, 10.0),
               clone_frequency=10000)
 
