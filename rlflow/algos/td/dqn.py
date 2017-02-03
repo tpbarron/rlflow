@@ -51,8 +51,8 @@ class DQN(RLAlgorithm):
         # vars to hold state updates
         self.last_state = None
 
-        self.states = self.train_policy.inputs[0]
-        self.q_values = self.train_policy.output
+        self.train_states = self.train_policy.inputs[0]
+        self.train_q_values = self.train_policy.output
 
         self.target_states = self.policy.inputs[0]
         self.target_q_values = self.policy.output
@@ -63,25 +63,38 @@ class DQN(RLAlgorithm):
         # This used to reduce the q-value to a single number!
         # I don't think that is what I want. I want a list of q-values and a list of targets
         # This should be bettwe with axis=1
-        self.q_value = tf.reduce_sum(tf.mul(self.q_values, self.a_one_hot), axis=1)
-        self.y = tf.placeholder(tf.float32, shape=[None])
+        self.q_estimates = tf.reduce_sum(tf.mul(self.train_q_values, self.a_one_hot), axis=1)
+        self.q_targets = tf.placeholder(tf.float32, shape=[None])
 
-        self.L = tf_utils.mean_square(self.q_value, self.y)
+
+        self.delta = self.q_targets - self.q_estimates
+        self.clipped_error = tf.where(tf.abs(self.delta) < 1.0,
+                                    0.5 * tf.square(self.delta),
+                                    tf.abs(self.delta) - 0.5, name='clipped_error')
+        self.L = tf.reduce_mean(self.clipped_error, name='loss')
+
         self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=self.train_policy.get_params())
+        # for idx, (grad, var) in enumerate(self.grads_and_vars):
+        #     if grad is not None:
+        #         self.grads_and_vars[idx] = (tf.clip_by_norm(grad, self.max_grad_norm), var)
+        self.update = self.opt.apply_gradients(self.grads_and_vars)
 
-        if None not in self.clip_gradients:
-            self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
-                                           for gv in self.grads_and_vars]
-            self.update = self.opt.apply_gradients(self.clipped_grads_and_vars)
-        else:
-            self.update = self.opt.apply_gradients(self.grads_and_vars)
+        # self.L = tf_utils.mean_square(self.q_value, self.y)
+        # self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=self.train_policy.get_params())
+        #
+        # if None not in self.clip_gradients:
+        #     self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
+        #                                    for gv in self.grads_and_vars]
+        #     self.update = self.opt.apply_gradients(self.clipped_grads_and_vars)
+        # else:
+        #     self.update = self.opt.apply_gradients(self.grads_and_vars)
 
 
     def clone(self):
         """
         Run the clone ops
         """
-        self.sess.run([self.clone_ops])
+        self.sess.run(self.clone_ops)
 
 
     def on_train_start(self):
@@ -99,7 +112,7 @@ class DQN(RLAlgorithm):
         if self.memory.size() < self.memory_init_size:
             return self.env.action_space.sample()
 
-        if self.exploration.explore():
+        if self.exploration.explore(self.steps):
             return self.env.action_space.sample()
         else:
             # find max action
@@ -126,7 +139,7 @@ class DQN(RLAlgorithm):
 
             if self.memory.size() >= self.memory_init_size:
                 # mark that we have done another step for epsilon decrease
-                self.exploration.increment_iteration()
+                # self.exploration.increment_iteration()
 
                 samples = self.memory.sample(self.sample_size)
                 states, actions, rewards, next_states, terminals = [], [], [], [], []
@@ -141,30 +154,21 @@ class DQN(RLAlgorithm):
                 next_states = np.stack(next_states)
 
                 # his takes about 0.01 seconds on my laptop
-                # with self.policy.clone_graph.as_default():
                 target_qs = self.sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
-
                 ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
 
-                # Is there a performance issue here? this takes about 0.07 seconds
-                # on my laptop
-
-                # print (self.sess.run(self.q_value,
-                #               feed_dict={self.states: states,
-                #                          self.actions: actions}))
-                #
-                #
-                # import sys
-                # sys.exit()
-
+                # Is there a performance issue here? this takes about 0.07 seconds on my laptop
                 self.sess.run(self.update,
-                              feed_dict={self.states: states,
+                              feed_dict={self.train_states: states,
                                          self.actions: actions,
-                                         self.y: ys})
+                                         self.q_targets: ys})
 
                 # if at desired step, clone model
                 if self.steps % self.clone_frequency == 0:
+                    # print ("Step ", self.steps, ", cloning model")
                     self.clone()
+
+                self.steps += 1
 
 
     def optimize(self):

@@ -14,8 +14,15 @@ from rlflow.core.input import InputStreamDownsamplerProcessor, InputStreamSequen
 
 
 def build_network(name_scope):
-    w_init = tf.truncated_normal_initializer(stddev=0.01)
+    w_init = tf.truncated_normal_initializer(stddev=0.05)
     b_init = tf.constant_initializer(value=0.0)
+
+    # with tf.name_scope(name_scope) as scope:
+    #     input_tensor = tf.placeholder(tf.float32, shape=[None, 4], name='policy_input_'+name_scope)
+    #     # input_tensor = tf.placeholder(tf.float32, shape=[None, 84, 84, 4], name='policy_input_'+name_scope)
+    #     net = tl.layers.InputLayer(input_tensor, name='input1_'+name_scope)
+    #     net = tl.layers.DenseLayer(net, 16, act=tf.nn.relu, name='dense1_'+name_scope)
+    #     net = tl.layers.DenseLayer(net, env.action_space.n, act=tf.identity, name='dense2_'+name_scope)
 
     with tf.name_scope(name_scope) as scope:
         input_tensor = tf.placeholder(tf.float32, shape=[None, 84, 84, 4], name='policy_input_'+name_scope)
@@ -31,7 +38,7 @@ def build_network(name_scope):
 
 
 if __name__ == "__main__":
-    env = gym.make("Pong-v0")
+    env = gym.make("Breakout-v0")
 
     input_tensor, net = build_network('train_net')
     network = Network([input_tensor],
@@ -43,14 +50,14 @@ if __name__ == "__main__":
                             clone_net,
                             Network.TYPE_DQN)
 
-    memory = ExperienceReplay(max_size=1000000)
-    egreedy = EpsilonGreedy(0.9, 0.1, 100000)
+    memory = ExperienceReplay(max_size=10000)
+    egreedy = EpsilonGreedy(0.9, 0.1, 10000)
 
     downsampler = InputStreamDownsamplerProcessor((84, 84), gray=True)
     sequential = InputStreamSequentialProcessor(observations=4)
     input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
-    opt = tf.train.RMSPropOptimizer(learning_rate=0.001, momentum=0.95, epsilon=0.01)
+    opt = tf.train.RMSPropOptimizer(learning_rate=0.00025, momentum=0.95, epsilon=0.01)
 
     dqn = DQN(env,
               network,
@@ -60,11 +67,11 @@ if __name__ == "__main__":
               input_processor=input_processor,
               discount=0.99,
               optimizer=opt,
-              memory_init_size=500,
+              memory_init_size=50000,
               clip_gradients=(-10.0, 10.0),
               clone_frequency=10000)
 
-    dqn.train(max_episodes=100000000, save_frequency=100)
+    dqn.train(max_episodes=10000, save_frequency=100)
 
     rewards = dqn.test(episodes=10)
     print ("Avg test reward: ", float(sum(rewards)) / len(rewards))

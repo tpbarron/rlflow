@@ -4,6 +4,7 @@ This module constains a base class for all implemented algorithms
 
 from __future__ import print_function
 
+import tqdm
 import numpy as np
 import tensorflow as tf
 import tflearn
@@ -184,8 +185,14 @@ class RLAlgorithm(object):
         if gym_record:
             self.env.monitor.start(gym_record_dir)
 
+        import time
+        # for i in tqdm.trange(max_episodes, leave=True):
         for i in range(max_episodes):
+
+            start = time.clock()
             ep_reward = self.optimize()
+            end = time.clock()
+            # print ("Elapsed: ", (end-start))
             print ("Episode reward: ", ep_reward)
             # self.summarize(i, ep_reward)
 
