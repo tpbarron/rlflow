@@ -78,7 +78,7 @@ class RLAlgorithm(object):
         return self.env.reset()
 
 
-    def act(self, obs):
+    def act(self, obs, mode):
         """
         Take in the current observation and return the action to take.
         Override for custom action selection, eg. epsilon greedy, gradient
@@ -87,8 +87,9 @@ class RLAlgorithm(object):
         if obs is None:
             return self.env.action_space.sample()
 
-        return self.policy.predict(obs)
-
+        action = self.policy.predict(obs)
+        # print (action)
+        return action
 
     def run_episode(self, render=True, verbose=False, mode=TRAIN):
         """

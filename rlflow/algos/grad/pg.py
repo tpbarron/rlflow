@@ -72,7 +72,11 @@ class PolicyGradient(RLAlgorithm):
         if self.standardize:
             formatted_rewards = rl_utils.standardize_rewards(formatted_rewards)
 
+        # print (formatted_actions)
+        # print (ep_states[4:])
+        print (np.array(ep_states[4:]).shape)
+        # print (formatted_rewards)
         self.sess.run(self.update, feed_dict={self.actions: formatted_actions,
-                                              self.states: ep_states,
+                                              self.states: np.array(ep_states),
                                               self.rewards: formatted_rewards})
         return ep_states, ep_actions, ep_rewards, ep_infos

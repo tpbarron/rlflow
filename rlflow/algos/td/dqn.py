@@ -119,12 +119,12 @@ class DQN(RLAlgorithm):
                 return self.env.action_space.sample()
             else:
                 # find max action
-                return super(DQN, self).act(obs)
+                return super(DQN, self).act(obs, mode)
         else:
             if np.random.random() < self.test_epsilon:
                 return self.env.action_space.sample()
             else:
-                return super(DQN, self).act(obs)
+                return super(DQN, self).act(obs, mode)
 
 
     def on_step_finish(self, obs, action, reward, done, info, mode):
