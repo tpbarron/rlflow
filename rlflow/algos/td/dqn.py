@@ -26,7 +26,8 @@ class DQN(RLAlgorithm):
                  clip_gradients=(None, None),
                  sample_size=32,
                  memory_init_size=5000,
-                 clone_frequency=10000):
+                 clone_frequency=10000,
+                 test_epsilon=0.05):
 
         super(DQN, self).__init__(env,
                                   clone_policy, # pass clone policy to super since that is the default for action selection
@@ -46,6 +47,7 @@ class DQN(RLAlgorithm):
         self.sample_size = sample_size
         self.memory_init_size = memory_init_size
         self.clone_frequency = clone_frequency
+        self.test_epsilon = test_epsilon
         self.steps = 0
 
         # vars to hold state updates
@@ -104,22 +106,28 @@ class DQN(RLAlgorithm):
         self.clone()
 
 
-    def act(self, obs):
+    def act(self, obs, mode):
         """
         Overriding act so can do proper exploration processing,
         add to memory and sample from memory for updates
         """
-        if self.memory.size() < self.memory_init_size:
-            return self.env.action_space.sample()
+        if mode == RLAlgorithm.TRAIN:
+            if self.memory.size() < self.memory_init_size:
+                return self.env.action_space.sample()
 
-        if self.exploration.explore(self.steps):
-            return self.env.action_space.sample()
+            if self.exploration.explore(self.steps):
+                return self.env.action_space.sample()
+            else:
+                # find max action
+                return super(DQN, self).act(obs)
         else:
-            # find max action
-            return super(DQN, self).act(obs)
+            if np.random.random() < self.test_epsilon:
+                return self.env.action_space.sample()
+            else:
+                return super(DQN, self).act(obs)
 
 
-    def on_step_completion(self, obs, action, reward, done, info, mode):
+    def on_step_finish(self, obs, action, reward, done, info, mode):
         """
         Receive data from the last step, add to memory
         """
@@ -169,10 +177,13 @@ class DQN(RLAlgorithm):
                     self.clone()
 
                 self.steps += 1
+        else: # TEST mode
+            pass
 
 
     def optimize(self):
         """
         In this case all the work happens in the callbacks, just run an episode
         """
+        print ("Current step: ", self.steps)
         return super(DQN, self).optimize()

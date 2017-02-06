@@ -77,7 +77,7 @@ class SARSA(RLAlgorithm):
             return super(SARSA, self).act(obs)
 
 
-    def on_step_completion(self, obs, action, reward, done, info, mode):
+    def on_step_finish(self, obs, action, reward, done, info, mode):
         """
         Receive data from the last step, add to memory
         """

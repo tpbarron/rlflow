@@ -87,16 +87,7 @@ class RLAlgorithm(object):
         if obs is None:
             return self.env.action_space.sample()
 
-        action = self.policy.predict(obs)
-        return action
-
-
-    def on_step_completion(self, state, action, reward, done, info, mode):
-        """
-        Callback method that subclasses can implement to receive info about
-        last step, this is called during training but not testing.
-        """
-        return
+        return self.policy.predict(obs)
 
 
     def run_episode(self, render=True, verbose=False, mode=TRAIN):
@@ -119,53 +110,43 @@ class RLAlgorithm(object):
                 self.env.render()
 
             obs = self.input_stream_processor.process_observation(obs)
-            action = self.act(obs)
+            action = self.act(obs, mode)
 
             # store observation used to predict and raw action
             ep_states.append(obs)
             ep_actions.append(action)
 
+            self.on_step_start()
             next_obs, reward, done, info = self.env.step(action)
 
             # call the callback method for subclasses
-            self.on_step_completion(obs, action, reward, done, info, mode)
+            self.on_step_finish(obs, action, reward, done, info, mode)
 
             # store reward from environment and any meta data returned
             ep_rewards.append(reward)
             ep_infos.append(info)
 
             obs = next_obs
-
             episode_itr += 1
 
         if verbose:
             print ('Game finished, reward: %f' % (sum(ep_rewards)))
 
+        # print ("rew list: ", ep_rewards, sum(ep_rewards))
         return ep_states, ep_actions, ep_rewards, ep_infos
 
 
     def optimize(self):
         """
         Optimize method that subclasses implement
-
-        In order for reward summarization to work properly this method should return
-        the total episode reward.
         """
-        _, _, ep_rewards, _ = self.run_episode()
-        # print ("Rewards: ", ep_rewards)
-        return sum(ep_rewards)
-
-
-    def on_train_start(self):
-        """
-        Callback for subclasses to implement if they wish to do any processing right
-        before training commences.
-        """
-        return
+        ep_states, ep_actions, ep_rewards, ep_infos = self.run_episode()
+        return ep_states, ep_actions, ep_rewards, ep_infos
 
 
     def train(self,
               max_episodes=10000,
+              test_frequency=100,
               save_frequency=100,
               gym_record=False,
               gym_record_dir='/tmp/rlflow/gym/',
@@ -180,27 +161,70 @@ class RLAlgorithm(object):
         self.sess.run(tf.global_variables_initializer())
         self.sess.graph.finalize()
 
-        self.on_train_start()
-
         if gym_record:
             self.env.monitor.start(gym_record_dir)
 
-        import time
-        # for i in tqdm.trange(max_episodes, leave=True):
-        for i in range(max_episodes):
+        self.on_train_start()
 
-            start = time.clock()
-            ep_reward = self.optimize()
-            end = time.clock()
-            # print ("Elapsed: ", (end-start))
+        for i in range(max_episodes):
+            self.on_episode_start()
+            _, _, ep_rewards, _ = self.optimize()
+            self.on_episode_finish()
+            ep_reward = sum(ep_rewards)
             print ("Episode reward: ", ep_reward)
             # self.summarize(i, ep_reward)
+
+            if i % test_frequency == 0:
+                _, _, test_ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+                test_reward = sum(test_ep_rewards)
+                print ("Test episode, reward: ", test_reward)
 
             if i % save_frequency == 0:
                 self.checkpoint(step=i)
 
+        self.on_train_finish()
+
         if gym_record:
             self.env.monitor.close()
+
+
+    # Training callbacks
+    def on_train_start(self):
+        """
+        Callback for subclasses to implement if they wish to do any processing right
+        before training commences.
+        """
+        return
+
+
+    def on_train_finish(self):
+        """
+        Callback for subclasses to implement if they wish to do any processing right
+        after training completes.
+        """
+        return
+
+
+    def on_episode_start(self):
+        return
+
+
+    def on_episode_finish(self):
+        pass
+
+
+    def on_step_start(self):
+        """
+        Callback method that subclasses can implement to receive info about
+        last step, this is called during training but not testing.
+        """
+        return
+
+
+    def on_step_finish(self, state, action, reward, done, info, mode):
+        """
+        """
+        return
 
 
     def test(self, episodes=10):

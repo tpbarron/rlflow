@@ -8,10 +8,10 @@ from .f_approximator import FunctionApproximator
 
 class Network(FunctionApproximator):
 
-    def __init__(self, model, pol_type, use_clone_net=False):
-        super(Network, self).__init__(model,
-                                      pol_type,
-                                      use_clone_net)
+    def __init__(self, inputs, model, pol_type):
+        super(Network, self).__init__(inputs,
+                                      model,
+                                      pol_type)
 
 
     def predict(self, x):
