@@ -20,7 +20,7 @@ def build_policy_copy_ops(policy1, policy2):
     """
     Build the ops to copy weights from policy1 to policy2
     """
-    clone_ops = [var1.assign(var2) for var1, var2 in zip(policy1.get_params(), policy2.get_params())]
+    clone_ops = [var2.assign(var1) for var1, var2 in zip(policy1.get_params(), policy2.get_params())]
     return clone_ops
 
 #

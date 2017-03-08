@@ -2,9 +2,6 @@ from __future__ import print_function
 
 import gym
 import tensorflow as tf
-import tensorlayer as tl
-#import tflearn
-
 
 from rlflow.policies.f_approx import Network
 from rlflow.algos.td import DQN
@@ -13,45 +10,59 @@ from rlflow.exploration.egreedy import EpsilonGreedy
 from rlflow.core.input import InputStreamDownsamplerProcessor, InputStreamSequentialProcessor, InputStreamProcessor
 
 
-def build_network(name_scope):
-    w_init = tf.truncated_normal_initializer(stddev=0.05)
+def build_network(name_scope, env):
+    w_init_conv2d = tf.contrib.layers.xavier_initializer_conv2d()
+    w_init_dense = tf.contrib.layers.xavier_initializer()
     b_init = tf.constant_initializer(value=0.0)
 
-    with tf.name_scope(name_scope) as scope:
-        input_tensor = tf.placeholder(tf.float32, shape=[None, 84, 84, 4], name='policy_input_'+name_scope)
-        net = tl.layers.InputLayer(input_tensor, name='input1_'+name_scope)
-        net = tl.layers.Conv2d(net, 16, (8, 8), (4, 4), act=tf.nn.relu, padding='SAME', W_init=w_init, b_init=b_init, name='conv1_'+name_scope)
-        net = tl.layers.Conv2d(net, 32, (4, 4), (2, 2), act=tf.nn.relu, padding='SAME', W_init=w_init, b_init=b_init, name='conv2_'+name_scope)
-        net = tl.layers.FlattenLayer(net, name='flatten1_'+name_scope)
-        net = tl.layers.DenseLayer(net, 1024, act=tf.nn.relu, name='dense1_'+name_scope)
-        net = tl.layers.DenseLayer(net, env.action_space.n, act=tf.identity, name='dense2_'+name_scope)
+    with tf.variable_scope(name_scope):
+        input_tensor = tf.placeholder(tf.float32,
+                                      shape=[None, 84, 84, 4],
+                                      name='policy_input_'+name_scope)
+        net = tf.contrib.layers.convolution2d(input_tensor,
+                                              16, (8, 8), (4, 4),
+                                              "SAME",
+                                              activation_fn=tf.nn.relu,
+                                              weights_initializer=w_init_conv2d,
+                                              scope='conv1_'+name_scope)
+        net = tf.contrib.layers.convolution2d(net,
+                                              16, (8, 8), (4, 4),
+                                              "SAME",
+                                              activation_fn=tf.nn.relu,
+                                              weights_initializer=w_init_conv2d,
+                                              scope='conv2_'+name_scope)
+        net = tf.contrib.layers.flatten(net,
+                                        scope='flatten1_'+name_scope)
+        net = tf.contrib.layers.fully_connected(net,
+                                                1024,
+                                                activation_fn=tf.nn.relu,
+                                                weights_initializer=w_init_dense,
+                                                scope='dense1_'+name_scope)
+        net = tf.contrib.layers.fully_connected(net,
+                                                env.action_space.n,
+                                                weights_initializer=w_init_dense,
+                                                scope='dense2_'+name_scope)
 
-    return input_tensor, net
-
+    return [input_tensor], [net]
 
 
 if __name__ == "__main__":
     env = gym.make("Breakout-v0")
 
-    input_tensor, net = build_network('train_net')
-    network = Network([input_tensor],
-                      net,
-                      Network.TYPE_DQN)
+    inputs, outputs = build_network("train_policy", env)
+    network = Network(inputs, outputs, scope="train_policy")
 
-    clone_input_tensor, clone_net = build_network('clone_net')
-    clone_network = Network([clone_input_tensor],
-                            clone_net,
-                            Network.TYPE_DQN)
+    clone_inputs, clone_outputs = build_network("clone_policy", env)
+    clone_network = Network(clone_inputs, clone_outputs, scope="clone_policy")
 
-    memory = ExperienceReplay(max_size=1000000)
+    memory = ExperienceReplay(state_shape=(84, 84, 4), max_size=10000)
     egreedy = EpsilonGreedy(0.9, 0.1, 1000000)
 
     downsampler = InputStreamDownsamplerProcessor((84, 84), gray=True)
     sequential = InputStreamSequentialProcessor(observations=4)
     input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
-    # opt = tf.train.AdaDelta
-    opt = tf.train.RMSPropOptimizer(learning_rate=0.00125, momentum=0.95, epsilon=0.01)
+    opt = tf.train.RMSPropOptimizer(learning_rate=0.01, momentum=0.95, epsilon=0.01)
 
     dqn = DQN(env,
               network,
@@ -61,11 +72,11 @@ if __name__ == "__main__":
               input_processor=input_processor,
               discount=0.99,
               optimizer=opt,
-              memory_init_size=50000,
+              memory_init_size=1000,
               clip_gradients=(-10.0, 10.0),
               clone_frequency=5000)
 
-    dqn.train(max_episodes=1000000, save_frequency=100)
+    dqn.train(max_episodes=1000000, test_frequency=10, save_frequency=100)
 
     rewards = dqn.test(episodes=10)
     print ("Avg test reward: ", float(sum(rewards)) / len(rewards))

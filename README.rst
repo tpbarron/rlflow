@@ -13,17 +13,11 @@ RLFlow
         :target: https://rlflow.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/tpbarron/rlflow/shield.svg
-     :target: https://pyup.io/repos/github/tpbarron/rlflow/
-     :alt: Updates
-
-
 A framework for learning about and experimenting with reinforcement learning algorithms.
-It is built on top of TensorFlow and `TFLearn <http://tflearn.org/>`_  and is interfaces
-with the OpenAI gym (universe should work, too). It aims to be as modular as possible so
-that new algorithms and ideas can easily be tested. I started it to gain a better
-understanding of core RL algorithms and maybe it can be useful for others as well.
-
+It is built on top of TensorFlow and interfaces with OpenAI gym (universe should work, too).
+It aims to be as modular as possible so that new algorithms and ideas can easily be tested.
+I started it to gain a better understanding of core RL algorithms and maybe it can be
+useful for others as well.
 
 Features
 --------

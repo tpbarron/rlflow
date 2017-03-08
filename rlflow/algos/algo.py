@@ -4,10 +4,10 @@ This module constains a base class for all implemented algorithms
 
 from __future__ import print_function
 
-import tqdm
 import numpy as np
 import tensorflow as tf
-import tflearn
+import pickle
+import os
 
 from rlflow.core import tf_utils
 from rlflow.core.input.input_stream_processor import InputStreamProcessor
@@ -88,8 +88,8 @@ class RLAlgorithm(object):
             return self.env.action_space.sample()
 
         action = self.policy.predict(obs)
-        # print (action)
         return action
+
 
     def run_episode(self, render=True, verbose=False, mode=TRAIN):
         """
@@ -140,6 +140,8 @@ class RLAlgorithm(object):
     def optimize(self):
         """
         Optimize method that subclasses implement
+
+        TODO: remove this and simply use run_episode
         """
         ep_states, ep_actions, ep_rewards, ep_infos = self.run_episode()
         return ep_states, ep_actions, ep_rewards, ep_infos
@@ -149,6 +151,7 @@ class RLAlgorithm(object):
               max_episodes=10000,
               test_frequency=100,
               save_frequency=100,
+              render_train=False,
               gym_record=False,
               gym_record_dir='/tmp/rlflow/gym/',
               tensorboard_log=False,
@@ -166,17 +169,16 @@ class RLAlgorithm(object):
             self.env.monitor.start(gym_record_dir)
 
         self.on_train_start()
-
         for i in range(max_episodes):
             self.on_episode_start()
             _, _, ep_rewards, _ = self.optimize()
             self.on_episode_finish()
             ep_reward = sum(ep_rewards)
-            print ("Episode reward: ", ep_reward)
+            # print ("Episode reward: ", ep_reward)
             # self.summarize(i, ep_reward)
 
             if i % test_frequency == 0:
-                _, _, test_ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+                _, _, test_ep_rewards, _ = self.run_episode(render=True, mode=RLAlgorithm.TEST)
                 test_reward = sum(test_ep_rewards)
                 print ("Test episode, reward: ", test_reward)
 
@@ -228,13 +230,26 @@ class RLAlgorithm(object):
         return
 
 
-    def test(self, episodes=10):
+    def test(self,
+             episodes=10,
+             record_experience=False,
+             record_experience_path='/tmp/rlflow/data/'):
         """
         Run the given number of episodes and return a list of the episode rewards
         """
         rewards = []
         for i in range(episodes):
-            _, _, ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+            ep_states, ep_actions, ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+            if record_experience:
+                with open(os.path.join(record_experience_path, "ep_states_"+str(i)+".pkl"), 'wb') as f:
+                    pickle.dump(ep_states, f)
+
+                with open(os.path.join(record_experience_path, "ep_actions_"+str(i)+".pkl"), 'wb') as f:
+                    pickle.dump(ep_actions, f)
+
+                with open(os.path.join(record_experience_path, "ep_rewards_"+str(i)+".pkl"), 'wb') as f:
+                    pickle.dump(ep_rewards, f)
+
             reward = sum(ep_rewards)
             rewards.append(reward)
 

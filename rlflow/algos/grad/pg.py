@@ -5,6 +5,7 @@ import tensorflow as tf
 import tflearn
 
 from rlflow.core import rl_utils
+from rlflow.core.output import output_processors
 from rlflow.algos.algo import RLAlgorithm
 
 class PolicyGradient(RLAlgorithm):
@@ -19,7 +20,7 @@ class PolicyGradient(RLAlgorithm):
                  discount=1.0,
                  standardize=True,
                  input_processor=None,
-                 optimizer='sgd',
+                 optimizer=None,
                  clip_gradients=(None, None),
                  baseline=None):
 
@@ -36,14 +37,13 @@ class PolicyGradient(RLAlgorithm):
         self.actions = tf.placeholder(tf.float32, shape=(None, env.action_space.n))
         self.rewards = tf.placeholder(tf.float32, shape=(None))
 
-        self.probs = self.policy.output
-        self.action_probs = tf.mul(self.probs, self.actions)
+        self.probs = self.policy.outputs[0]
+        self.action_probs = tf.multiply(self.probs, self.actions)
         self.reduced_action_probs = tf.reduce_sum(self.action_probs, reduction_indices=[1])
         self.logprobs = tf.log(self.reduced_action_probs)
 
         # vanilla gradient = mul(sum(logprobs * rewards))
-        self.L = -tf.reduce_sum(tf.mul(self.logprobs, self.rewards))
-
+        self.L = -tf.reduce_sum(tf.multiply(self.logprobs, self.rewards))
         self.grads_and_vars = self.opt.compute_gradients(self.L)
 
         if None not in self.clip_gradients:
@@ -53,8 +53,25 @@ class PolicyGradient(RLAlgorithm):
         else:
             self.update = self.opt.apply_gradients(self.grads_and_vars)
 
+
+        # sampling
+        self.policy_output = tf.placeholder(tf.float32, shape=(None, env.action_space.n))
+        self.policy_sample = output_processors.pg_sample(self.policy_output)
+
         # TODO: if baseline is set, learn a critic
         self.baseline = baseline
+
+
+
+    def act(self, obs, mode):
+        """
+        Override action procedure to take policy output and sample as probabilities
+        """
+        pol_out = np.squeeze(super(PolicyGradient, self).act(obs, mode))
+        # print (pol_out)
+        # print (pol_out, sum(pol_out))
+        return np.random.choice(range(len(pol_out)), p=np.squeeze(pol_out))
+        # return self.sess.run(self.policy_sample, feed_dict={self.policy_output: pol_out})
 
 
     def optimize(self):
@@ -74,7 +91,7 @@ class PolicyGradient(RLAlgorithm):
 
         # print (formatted_actions)
         # print (ep_states[4:])
-        print (np.array(ep_states[4:]).shape)
+        # print (np.array(ep_states[4:]).shape)
         # print (formatted_rewards)
         self.sess.run(self.update, feed_dict={self.actions: formatted_actions,
                                               self.states: np.array(ep_states),

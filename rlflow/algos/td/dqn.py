@@ -1,8 +1,11 @@
 from __future__ import print_function
 
 import numpy as np
+# from keras.layers import Input
+# from keras import backend as K
+# from keras.optimizers import RMSprop
 import tensorflow as tf
-import tensorlayer as tl
+# import tensorlayer as tl
 
 from rlflow.algos.algo import RLAlgorithm
 from rlflow.core import tf_utils
@@ -14,7 +17,7 @@ class DQN(RLAlgorithm):
 
     def __init__(self,
                  env,
-                 policy,
+                 train_policy,
                  clone_policy,
                  memory,
                  exploration,
@@ -38,10 +41,7 @@ class DQN(RLAlgorithm):
                                   optimizer,
                                   clip_gradients)
 
-
-        self.clone_ops = tf_utils.build_policy_copy_ops(policy, clone_policy)
-
-        self.train_policy = policy
+        self.train_policy = train_policy
         self.memory = memory
         self.exploration = exploration
         self.sample_size = sample_size
@@ -50,14 +50,37 @@ class DQN(RLAlgorithm):
         self.test_epsilon = test_epsilon
         self.steps = 0
 
+        self.clone_ops = tf_utils.build_policy_copy_ops(self.train_policy, self.policy)
+
         # vars to hold state updates
         self.last_state = None
 
-        self.train_states = self.train_policy.inputs[0]
-        self.train_q_values = self.train_policy.output
+        self.train_states = self.train_policy.inputs[0] # self.train_policy.inputs[0]
+        self.train_q_values = self.train_policy.outputs[0] # self.train_policy.output
 
-        self.target_states = self.policy.inputs[0]
-        self.target_q_values = self.policy.output
+        self.target_states = self.policy.inputs[0] #self.policy.inputs[0]
+        self.target_q_values = self.policy.outputs[0] # self.self.policy.output
+
+        # self.S1 = Input(shape=(84, 84, 4))
+        # self.S2 = Input(shape=(84, 84, 4))
+        # self.A = Input(shape=(1,), dtype='int32')
+        # self.R = Input(shape=(1,), dtype='float32')
+        # self.T = Input(shape=(1,), dtype='float32')
+
+        # VS = self.train_q_values #self.train_policy.model(self.S1)
+        # VNS = self.target_q_values #self.policy.model(self.S2)
+        #
+        # future_value = (1-self.T) * K.max(VNS, axis=1, keepdims=True)
+        #
+        # print ("Past max")
+        # discounted_future_value = self.discount * future_value
+        # target = self.R + discounted_future_value
+        #
+        # cost = (VS[:, self.A] - target)#**2).mean()
+        # opt = RMSprop(0.0001)
+        # updates = opt.get_updates(self.policy.model.trainable_weights, [], cost)
+        # self.update = K.function([self.train_states, self.target_states, self.A, self.R, self.T], cost, updates=updates)
+
 
         self.actions = tf.placeholder(tf.int64, shape=[None])
         self.a_one_hot = tf.one_hot(self.actions, self.env.action_space.n, 1.0, 0.0)
@@ -65,7 +88,7 @@ class DQN(RLAlgorithm):
         # This used to reduce the q-value to a single number!
         # I don't think that is what I want. I want a list of q-values and a list of targets
         # This should be bettwe with axis=1
-        self.q_estimates = tf.reduce_sum(tf.mul(self.train_q_values, self.a_one_hot), axis=1)
+        self.q_estimates = tf.reduce_sum(tf.multiply(self.train_q_values, self.a_one_hot), axis=1)
         self.q_targets = tf.placeholder(tf.float32, shape=[None])
 
 
@@ -96,7 +119,16 @@ class DQN(RLAlgorithm):
         """
         Run the clone ops
         """
+        # print ("Cloning")
         self.sess.run(self.clone_ops)
+
+        # self.train_policy.model.get_weights()
+        # self.policy.model.set_weights(self.train_policy.model.get_weights())
+        # v1 = self.sess.run(self.train_policy.get_params()[0])
+        # v2 = self.sess.run(self.policy.get_params()[0])
+        # print (np.allclose(v1, v2))
+        # import sys
+        # sys.exit()
 
 
     def on_train_start(self):
@@ -104,6 +136,11 @@ class DQN(RLAlgorithm):
         Run the clone ops to make networks same at start
         """
         self.clone()
+
+
+    def max_action(self, obs, mode):
+        actions = super(DQN, self).act(obs, mode)
+        return np.argmax(actions)
 
 
     def act(self, obs, mode):
@@ -119,12 +156,14 @@ class DQN(RLAlgorithm):
                 return self.env.action_space.sample()
             else:
                 # find max action
-                return super(DQN, self).act(obs, mode)
+                return self.max_action(obs, mode)
+                # return super(DQN, self).act(obs, mode)
         else:
             if np.random.random() < self.test_epsilon:
                 return self.env.action_space.sample()
             else:
-                return super(DQN, self).act(obs, mode)
+                return self.max_action(obs, mode)
+                # return super(DQN, self).act(obs, mode)
 
 
     def on_step_finish(self, obs, action, reward, done, info, mode):
@@ -139,7 +178,7 @@ class DQN(RLAlgorithm):
             # obs is None until the input processor provides valid processing
             if self.last_state is not None and obs is not None:
                 # then this is not the first state seen
-                self.memory.add_element([self.last_state, action, reward, obs, done])
+                self.memory.add_element(self.last_state, action, reward, obs, done)
 
             # else this is the first state in the episode, either way
             # keep track of last state, if this is the end of an episode mark it
@@ -149,19 +188,10 @@ class DQN(RLAlgorithm):
                 # mark that we have done another step for epsilon decrease
                 # self.exploration.increment_iteration()
 
-                samples = self.memory.sample(self.sample_size)
-                states, actions, rewards, next_states, terminals = [], [], [], [], []
-                for s in samples:
-                    states.append(s.S1)
-                    actions.append(s.A)
-                    rewards.append(s.R)
-                    next_states.append(s.S2)
-                    terminals.append(s.T)
-
-                terminals = np.array(terminals) + 0
-                next_states = np.stack(next_states)
+                states, actions, rewards, next_states, terminals = self.memory.sample(self.sample_size)
 
                 # his takes about 0.01 seconds on my laptop
+                # print ("next states: ", next_states.shape)
                 target_qs = self.sess.run(self.target_q_values, feed_dict={self.target_states: next_states})
                 ys = rewards + (1 - terminals) * self.discount * np.max(target_qs, axis=1)
 
