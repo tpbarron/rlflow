@@ -10,6 +10,7 @@ import pickle
 import os
 
 from rlflow.core import tf_utils
+from rlflow.core import io_utils
 from rlflow.core.input.input_stream_processor import InputStreamProcessor
 
 # # Fix for TF 0.12
@@ -59,7 +60,10 @@ class RLAlgorithm(object):
             self.input_stream_processor = InputStreamProcessor()
 
 
-        self.saver = tf.train.Saver()
+        try:
+            self.saver = tf.train.Saver()
+        except:
+            self.saver = None
         # self.summary_op = None
         # self.build_summary_ops()
         # self.summary_writer = tf.train.SummaryWriter('/tmp/rlflow/log',
@@ -91,7 +95,7 @@ class RLAlgorithm(object):
         return action
 
 
-    def run_episode(self, render=True, verbose=False, mode=TRAIN):
+    def run_episode(self, render=False, verbose=False, mode=TRAIN):
         """
         Runs environment to completion and returns reward under given policy
         Returns the sequence of rewards, states, raw actions (direct from the policy),
@@ -180,7 +184,7 @@ class RLAlgorithm(object):
             if i % test_frequency == 0:
                 _, _, test_ep_rewards, _ = self.run_episode(render=True, mode=RLAlgorithm.TEST)
                 test_reward = sum(test_ep_rewards)
-                print ("Test episode, reward: ", test_reward)
+                print ("Test episode (itr " + str(i) + "), reward: ", test_reward)
 
             if i % save_frequency == 0:
                 self.checkpoint(step=i)
@@ -237,18 +241,18 @@ class RLAlgorithm(object):
         """
         Run the given number of episodes and return a list of the episode rewards
         """
+        io_utils.create_dir_if_not_exists(record_experience_path)
         rewards = []
         for i in range(episodes):
-            ep_states, ep_actions, ep_rewards, _ = self.run_episode(mode=RLAlgorithm.TEST)
+            ep_states, ep_actions, ep_rewards, _ = self.run_episode(render=False, mode=RLAlgorithm.TEST)
             if record_experience:
-                with open(os.path.join(record_experience_path, "ep_states_"+str(i)+".pkl"), 'wb') as f:
-                    pickle.dump(ep_states, f)
-
-                with open(os.path.join(record_experience_path, "ep_actions_"+str(i)+".pkl"), 'wb') as f:
-                    pickle.dump(ep_actions, f)
-
-                with open(os.path.join(record_experience_path, "ep_rewards_"+str(i)+".pkl"), 'wb') as f:
-                    pickle.dump(ep_rewards, f)
+                ep_states = np.array(ep_states)
+                ep_actions = np.array(ep_actions)
+                ep_rewards = np.array(ep_rewards)
+                io_utils.save_h5py(os.path.join(record_experience_path, "ep_"+str(i)+".h5"), ep_states, ep_actions, ep_rewards)
+                # io_utils.save_pickle(os.path.join(record_experience_path, "ep_states_"+str(i)+".pkl"), ep_states)
+                # io_utils.save_pickle(os.path.join(record_experience_path, "ep_actions_"+str(i)+".pkl"), ep_actions)
+                # io_utils.save_pickle(os.path.join(record_experience_path, "ep_rewards_"+str(i)+".pkl"), ep_rewards)
 
             reward = sum(ep_rewards)
             rewards.append(reward)

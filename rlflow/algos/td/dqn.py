@@ -61,27 +61,6 @@ class DQN(RLAlgorithm):
         self.target_states = self.policy.inputs[0] #self.policy.inputs[0]
         self.target_q_values = self.policy.outputs[0] # self.self.policy.output
 
-        # self.S1 = Input(shape=(84, 84, 4))
-        # self.S2 = Input(shape=(84, 84, 4))
-        # self.A = Input(shape=(1,), dtype='int32')
-        # self.R = Input(shape=(1,), dtype='float32')
-        # self.T = Input(shape=(1,), dtype='float32')
-
-        # VS = self.train_q_values #self.train_policy.model(self.S1)
-        # VNS = self.target_q_values #self.policy.model(self.S2)
-        #
-        # future_value = (1-self.T) * K.max(VNS, axis=1, keepdims=True)
-        #
-        # print ("Past max")
-        # discounted_future_value = self.discount * future_value
-        # target = self.R + discounted_future_value
-        #
-        # cost = (VS[:, self.A] - target)#**2).mean()
-        # opt = RMSprop(0.0001)
-        # updates = opt.get_updates(self.policy.model.trainable_weights, [], cost)
-        # self.update = K.function([self.train_states, self.target_states, self.A, self.R, self.T], cost, updates=updates)
-
-
         self.actions = tf.placeholder(tf.int64, shape=[None])
         self.a_one_hot = tf.one_hot(self.actions, self.env.action_space.n, 1.0, 0.0)
 
@@ -90,45 +69,22 @@ class DQN(RLAlgorithm):
         # This should be bettwe with axis=1
         self.q_estimates = tf.reduce_sum(tf.multiply(self.train_q_values, self.a_one_hot), axis=1)
         self.q_targets = tf.placeholder(tf.float32, shape=[None])
-
-
-        self.delta = self.q_targets - self.q_estimates
-        self.clipped_error = tf.where(tf.abs(self.delta) < 1.0,
-                                    0.5 * tf.square(self.delta),
-                                    tf.abs(self.delta) - 0.5, name='clipped_error')
-        self.L = tf.reduce_mean(self.clipped_error, name='loss')
-
+        self.L = tf.losses.mean_squared_error(self.q_targets, self.q_estimates)
         self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=self.train_policy.get_params())
-        # for idx, (grad, var) in enumerate(self.grads_and_vars):
-        #     if grad is not None:
-        #         self.grads_and_vars[idx] = (tf.clip_by_norm(grad, self.max_grad_norm), var)
-        self.update = self.opt.apply_gradients(self.grads_and_vars)
-
-        # self.L = tf_utils.mean_square(self.q_value, self.y)
-        # self.grads_and_vars = self.opt.compute_gradients(self.L, var_list=self.train_policy.get_params())
-        #
-        # if None not in self.clip_gradients:
-        #     self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
-        #                                    for gv in self.grads_and_vars]
-        #     self.update = self.opt.apply_gradients(self.clipped_grads_and_vars)
-        # else:
-        #     self.update = self.opt.apply_gradients(self.grads_and_vars)
+        if None not in self.clip_gradients:
+            self.clipped_grads_and_vars = [(tf.clip_by_value(gv[0], clip_gradients[0], clip_gradients[1]), gv[1])
+                                           for gv in self.grads_and_vars]
+            self.update = self.opt.apply_gradients(self.clipped_grads_and_vars)
+        else:
+            self.update = self.opt.apply_gradients(self.grads_and_vars)
 
 
     def clone(self):
         """
         Run the clone ops
         """
-        # print ("Cloning")
+        # print ("DQN: cloning model")
         self.sess.run(self.clone_ops)
-
-        # self.train_policy.model.get_weights()
-        # self.policy.model.set_weights(self.train_policy.model.get_weights())
-        # v1 = self.sess.run(self.train_policy.get_params()[0])
-        # v2 = self.sess.run(self.policy.get_params()[0])
-        # print (np.allclose(v1, v2))
-        # import sys
-        # sys.exit()
 
 
     def on_train_start(self):
@@ -215,5 +171,4 @@ class DQN(RLAlgorithm):
         """
         In this case all the work happens in the callbacks, just run an episode
         """
-        print ("Current step: ", self.steps)
         return super(DQN, self).optimize()

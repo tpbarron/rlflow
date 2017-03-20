@@ -68,10 +68,7 @@ class PolicyGradient(RLAlgorithm):
         Override action procedure to take policy output and sample as probabilities
         """
         pol_out = np.squeeze(super(PolicyGradient, self).act(obs, mode))
-        # print (pol_out)
-        # print (pol_out, sum(pol_out))
-        return np.random.choice(range(len(pol_out)), p=np.squeeze(pol_out))
-        # return self.sess.run(self.policy_sample, feed_dict={self.policy_output: pol_out})
+        return np.random.choice(range(len(pol_out)), p=pol_out)
 
 
     def optimize(self):

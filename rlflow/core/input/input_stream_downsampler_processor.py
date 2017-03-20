@@ -5,12 +5,17 @@ from .input_stream_processor import InputStreamProcessor
 
 class InputStreamDownsamplerProcessor(InputStreamProcessor):
 
-    def __init__(self, size, gray=False):
+    def __init__(self, size, gray=False, scale=True):
         """
         The size to downsample to and whether to convert to grayscales
+          size: a tuple representing the size of downsample to
+          gray: boolean convert rgb to gray
+          scale: boolean divides all pixels by 255.
         """
         self.size = size
         self.gray = gray
+        self.scale = scale
+
 
 
     def reset(self):
@@ -26,12 +31,16 @@ class InputStreamDownsamplerProcessor(InputStreamProcessor):
         Take in the current observation, do any necessary processing and return
         the processed observation.
         """
-        assert len(obs.shape) == 2 or len(obs.shape) == 3
+        assert obs.ndim == 2 or obs.ndim == 3
 
         I = PIL.Image.fromarray(obs)
-        if len(obs.shape) == 3 and self.gray:
+        if obs.ndim == 3 and self.gray:
             I = I.convert('L')
 
         I = I.resize(self.size, PIL.Image.NEAREST)
-        obs = np.array(I)
+        obs = np.array(I, dtype=np.float32)
+
+        if self.scale:
+            obs /= 255.
+
         return obs

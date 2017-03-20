@@ -33,18 +33,6 @@ def stddev(x):
         (tf.sub(x, tf.fill(x.get_shape(), tf.reduce_mean(x)))))))
 
 
-def mean_square(y_pred, y_true):
-    """ Mean Square Loss.
-    Arguments:
-        y_pred: `Tensor` of `float` type. Predicted values.
-        y_true: `Tensor` of `float` type. Targets (labels).
-
-    From: https://github.com/tflearn/tflearn/blob/master/tflearn/objectives.py
-    """
-    with tf.name_scope("MeanSquare"):
-        return tf.reduce_mean(tf.square(y_pred - y_true))
-
-
 #
 # Get input tensor shape from env obs space
 #
