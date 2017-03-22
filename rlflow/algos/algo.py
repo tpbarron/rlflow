@@ -95,7 +95,7 @@ class RLAlgorithm(object):
         return action
 
 
-    def run_episode(self, render=False, verbose=False, mode=TRAIN):
+    def run_episode(self, render=False, verbose=True, mode=TRAIN):
         """
         Runs environment to completion and returns reward under given policy
         Returns the sequence of rewards, states, raw actions (direct from the policy),
@@ -170,6 +170,7 @@ class RLAlgorithm(object):
         self.sess.graph.finalize()
 
         if gym_record:
+            io_utils.create_dir_if_not_exists(gym_record_dir)
             self.env.monitor.start(gym_record_dir)
 
         self.on_train_start()

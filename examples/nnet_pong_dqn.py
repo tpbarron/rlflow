@@ -13,7 +13,7 @@ from rlflow.core.input import InputStreamDownsamplerProcessor, InputStreamSequen
 def build_network(name_scope, env):
     w_init_conv2d = tf.contrib.layers.xavier_initializer_conv2d()
     w_init_dense = tf.contrib.layers.xavier_initializer()
-    b_init = tf.constant_initializer(value=0.0)
+    b_init = tf.constant_initializer(value=0.1)
 
     with tf.variable_scope(name_scope):
         input_tensor = tf.placeholder(tf.float32,
@@ -57,10 +57,10 @@ if __name__ == "__main__":
     clone_inputs, clone_outputs = build_network("clone_policy", env)
     clone_network = Network(clone_inputs, clone_outputs, scope="clone_policy")
 
-    memory = ExperienceReplay(state_shape=(84, 84, 4), max_size=50000)
+    memory = ExperienceReplay(state_shape=(84, 84, 4), max_size=20000)
     egreedy = EpsilonGreedy(0.9, 0.1, 1000000)
 
-    downsampler = InputStreamDownsamplerProcessor((84, 84), gray=True)
+    downsampler = InputStreamDownsamplerProcessor((84, 84), gray=True, scale=True)
     sequential = InputStreamSequentialProcessor(observations=4)
     input_processor = InputStreamProcessor(processor_list=[downsampler, sequential])
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
               input_processor=input_processor,
               discount=0.99,
               optimizer=opt,
-              memory_init_size=50000,
+              memory_init_size=20000,
               clip_gradients=(-10.0, 10.0),
               clone_frequency=5000)
 

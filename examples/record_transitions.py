@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     random_pol = RandomPolicy(env.action_space)
 
-    downsampler = InputStreamDownsamplerProcessor((28, 28), gray=True)
+    downsampler = InputStreamDownsamplerProcessor((32, 32), gray=False)
     input_processor = InputStreamProcessor(processor_list=[downsampler])
 
     algo = RLAlgorithm(env,
@@ -29,4 +29,4 @@ if __name__ == "__main__":
 
     algo.test(episodes=10,
               record_experience=True,
-              record_experience_path='/media/trevor/22c63957-b0cc-45b6-9d8f-173d9619fb73/data/pong_random_small/')
+              record_experience_path='/media/trevor/22c63957-b0cc-45b6-9d8f-173d9619fb73/data/pong_random_color/')
