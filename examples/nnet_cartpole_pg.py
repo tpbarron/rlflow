@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import gym
+import numpy as np
 import tensorflow as tf
 
 from rlflow.core import tf_utils
@@ -34,22 +35,22 @@ def build_network(name_scope, env):
 
 
 if __name__ == "__main__":
-    env = gym.make("CartPole-v0")
+    env = gym.make("CartPole-v1")
 
     inputs, outputs = build_network("train_policy", env)
     policy = Network(inputs, outputs, scope="train_policy")
 
     pg = PolicyGradient(env,
                         policy,
-                        episode_len=500,
+                        episode_len=np.inf,
                         discount=0.99,
-                        optimizer=tf.train.AdamOptimizer(learning_rate=0.005))
+                        optimizer=tf.train.RMSPropOptimizer(learning_rate=0.01))
 
-    # pg.train(max_episodes=5000,
-    #          save_frequency=10,
-    #          render_train=True)
+    pg.train(max_episodes=5000,
+             save_frequency=10,
+             render_train=True)
 
-    pg.restore(ckpt_file="/tmp/rlflow/model.ckpt-320")
+    # pg.restore(ckpt_file="/tmp/rlflow/model.ckpt-320")
 
     rewards = pg.test(episodes=10,
                       record_experience=True)

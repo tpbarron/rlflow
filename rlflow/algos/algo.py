@@ -4,6 +4,7 @@ This module constains a base class for all implemented algorithms
 
 from __future__ import print_function
 
+import PIL
 import numpy as np
 import tensorflow as tf
 import pickle
@@ -238,14 +239,23 @@ class RLAlgorithm(object):
     def test(self,
              episodes=10,
              record_experience=False,
-             record_experience_path='/tmp/rlflow/data/'):
+             record_experience_path='/tmp/rlflow/data/',
+             save_images=False):
         """
         Run the given number of episodes and return a list of the episode rewards
         """
         io_utils.create_dir_if_not_exists(record_experience_path)
+        io_utils.create_dir_if_not_exists(os.path.join(record_experience_path, "imgs"))
         rewards = []
         for i in range(episodes):
             ep_states, ep_actions, ep_rewards, _ = self.run_episode(render=False, mode=RLAlgorithm.TEST)
+
+            if save_images:
+                for j in range(len(ep_states)):
+                    s = ep_states[j]
+                    I = PIL.Image.fromarray(np.uint8(s))
+                    I.save(os.path.join(record_experience_path, "imgs/i_"+str(i)+"_"+str(j)+".png"))
+
             if record_experience:
                 ep_states = np.array(ep_states)
                 ep_actions = np.array(ep_actions)
@@ -257,6 +267,9 @@ class RLAlgorithm(object):
 
             reward = sum(ep_rewards)
             rewards.append(reward)
+
+            if i % 100 == 0:
+                print ("Finished test episode ", i)
 
         return rewards
 

@@ -37,7 +37,7 @@ class InputStreamDownsamplerProcessor(InputStreamProcessor):
         if obs.ndim == 3 and self.gray:
             I = I.convert('L')
 
-        I = I.resize(self.size, PIL.Image.NEAREST)
+        I = I.resize(self.size, PIL.Image.BILINEAR)
         obs = np.array(I, dtype=np.float32)
 
         if self.scale:

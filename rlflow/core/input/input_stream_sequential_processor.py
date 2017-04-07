@@ -27,10 +27,19 @@ class InputStreamSequentialProcessor(InputStreamProcessor):
         random action will be taken.
         """
         self.current_sequence.append(obs)
-        if len(self.current_sequence) < self.observations:
-            return None
+        l = len(self.current_sequence)
 
-        if len(self.current_sequence) > self.observations:
+        if l < self.observations:
+            # task the last obs and repeat self.observations-l+1 times
+            # 4-1+1 = 4
+            # 4-2+1 = 3
+            # ...
+            extra = np.repeat(obs.reshape(tuple(obs.shape)+(1,)), self.observations-l, axis=len(obs.shape))
+            concat = np.concatenate((np.stack(self.current_sequence, axis=len(obs.shape)), extra), axis=len(obs.shape))
+            # print (concat.shape)
+            return concat
+
+        if l > self.observations:
             self.current_sequence.pop(0)
 
         # convert current sequence to input
